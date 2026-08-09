@@ -8285,13 +8285,13 @@
         <parent link="aronachnaq_outter_board_rim__fillet6_3" />
         <child link="aronachnaq_tyre__fillet27__2__loop_closure" />
     </joint>
-    <joint name="revolute_1" type="continuous">
+    <joint name="revolute_1" type="fixed">
         <origin xyz="-2.2693e-13 2.36547e-14 0.0098" rpy="1.5708 -1.11022e-15 -1.51405" />
         <axis xyz="1.60812e-16 -1 -0" />
         <parent link="m3_ÂÝÎÆ__1" />
         <child link="part_1_48" />
     </joint>
-    <joint name="revolute_2" type="continuous">
+    <joint name="revolute_2" type="fixed">
         <origin xyz="-2.26919e-13 2.36478e-14 0.0103" rpy="0 -1.5708 1.5708" />
         <axis xyz="-1 0 0" />
         <parent link="m3_ÂÝÎÆ__1_1" />
@@ -8299,7 +8299,7 @@
     </joint>
     <joint name="revolute_3" type="continuous">
         <origin xyz="2.77556e-17 0 -0.04" rpy="0 1.5708 2.28992e-14" />
-        <axis xyz="-1 0 0" />
+        <axis xyz="1 0 0" />
         <parent link="part_1_230" />
         <child link="aronachnaq_outter_board_rim__fillet6_2" />
     </joint>
@@ -8317,7 +8317,7 @@
     </joint>
     <joint name="revolute_4" type="continuous">
         <origin xyz="0 0 -0.04" rpy="0 1.5708 2.28394e-14" />
-        <axis xyz="-1 -0 -0" />
+        <axis xyz="1 0 0" />
         <parent link="part_1_189" />
         <child link="aronachnaq_inside_board_rim__fillet1_2" />
     </joint>
@@ -8524,5 +8524,61 @@
         <axis xyz="-0 -0 -1" />
         <parent link="part_1_221" />
         <child link="part_1__3__loop_closure" />
+    </joint>
+    <link name="water_tank">
+        <inertial>
+            <mass value="0.0001" />
+            <origin xyz="0 0 0" rpy="0 0 0" />
+            <inertia ixx="1.31476e-06" ixy="0" ixz="0" iyy="1.31476e-06" iyz="0" izz="4.1519e-07" />
+        </inertial>
+        <visual>
+            <origin xyz="0 0 0" rpy="0 0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/water_tank.stl" scale="1 1 1" />
+            </geometry>
+            <material name="water_tank_blue">
+                <color rgba="0.2 0.5 0.9 1" />
+            </material>
+        </visual>
+        <collision>
+            <origin xyz="0 0 0" rpy="0 0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/water_tank.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
+    </link>
+
+    <joint name="water_tank_joint" type="fixed">
+        <origin xyz="-0.252742 0.361599 -0.481520" rpy="-1.5708 0 0" />
+        <parent link="root" />
+        <child link="water_tank" />
+    </joint>
+    <link name="water_tank_2">
+        <inertial>
+            <mass value="1e-05" />
+            <origin xyz="0 0 0" rpy="0 0 0" />
+            <inertia ixx="2.0039e-09" ixy="0" ixz="0" iyy="2.0039e-09" iyz="0" izz="6.328e-10" />
+        </inertial>
+        <visual>
+            <origin xyz="0 0 0" rpy="0 0 0" />
+            <geometry>
+                <cylinder radius="0.01125" length="0.045" />
+            </geometry>
+            <material name="water_tank_2_blue">
+                <color rgba="0.2 0.5 0.9 1" />
+            </material>
+        </visual>
+        <collision>
+            <origin xyz="0 0 0" rpy="0 0 0" />
+            <geometry>
+                <cylinder radius="0.01125" length="0.045" />
+            </geometry>
+        </collision>
+    </link>
+
+    <joint name="water_tank_2_joint" type="fixed">
+        <origin xyz="0 0 0.0225" rpy="0 0 0" />
+        <parent link="part_1_48" />
+        <child link="water_tank_2" />
     </joint>
 </robot>
