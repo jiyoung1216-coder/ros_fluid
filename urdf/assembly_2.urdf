@@ -15,6 +15,12 @@
                 <color rgba="0.615686 0.811765 0.929412 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="0 0 0" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Aronachnaq_center_section__Chamfer3.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="aronachnaq_center_section__chamfer3_1">
         <inertial>
@@ -31,6 +37,12 @@
                 <color rgba="0.615686 0.811765 0.929412 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="0 0 0" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Aronachnaq_center_section__Chamfer3.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="aronachnaq_center_section__chamfer3_2">
         <inertial>
@@ -47,6 +59,12 @@
                 <color rgba="0.615686 0.811765 0.929412 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="0 0 0" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Aronachnaq_center_section__Chamfer3.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="aronachnaq_center_section__chamfer3_3">
         <inertial>
@@ -63,6 +81,12 @@
                 <color rgba="0.615686 0.811765 0.929412 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="0 0 0" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Aronachnaq_center_section__Chamfer3.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="aronachnaq_center_section__chamfer3__2__loop_closure">
         <inertial>
@@ -86,6 +110,12 @@
                 <color rgba="0.647059 0.647059 0.647059 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="0 0 0" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Aronachnaq_inside_board_rim__Fillet1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="aronachnaq_inside_board_rim__fillet1_1">
         <inertial>
@@ -102,6 +132,12 @@
                 <color rgba="0.647059 0.647059 0.647059 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="0 0 0" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Aronachnaq_inside_board_rim__Fillet1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="aronachnaq_inside_board_rim__fillet1_2">
         <inertial>
@@ -118,6 +154,12 @@
                 <color rgba="0.647059 0.647059 0.647059 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="-0.04012 0 0" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Aronachnaq_inside_board_rim__Fillet1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="aronachnaq_inside_board_rim__fillet1_3">
         <inertial>
@@ -134,6 +176,12 @@
                 <color rgba="0.647059 0.647059 0.647059 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="0 0 0" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Aronachnaq_inside_board_rim__Fillet1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="aronachnaq_outter_board_rim__fillet6">
         <inertial>
@@ -150,6 +198,12 @@
                 <color rgba="0.917647 0.917647 0.917647 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="-0.038183 0 0" rpy="-0.384868 0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Aronachnaq_outter_board_rim__Fillet6.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="aronachnaq_outter_board_rim__fillet6_1">
         <inertial>
@@ -166,6 +220,12 @@
                 <color rgba="0.917647 0.917647 0.917647 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="-0.038183 0 0" rpy="-0.384868 0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Aronachnaq_outter_board_rim__Fillet6.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="aronachnaq_outter_board_rim__fillet6_2">
         <inertial>
@@ -182,6 +242,12 @@
                 <color rgba="0.917647 0.917647 0.917647 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="-0.038183 0 0" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Aronachnaq_outter_board_rim__Fillet6.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="aronachnaq_outter_board_rim__fillet6_3">
         <inertial>
@@ -198,6 +264,12 @@
                 <color rgba="0.917647 0.917647 0.917647 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="0 0 0" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Aronachnaq_outter_board_rim__Fillet6.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="aronachnaq_rim__revolve2">
         <inertial>
@@ -214,6 +286,12 @@
                 <color rgba="0.231373 0.380392 0.705882 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="0 0 0" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Aronachnaq_rim__Revolve2.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="aronachnaq_rim__revolve2_1">
         <inertial>
@@ -230,6 +308,12 @@
                 <color rgba="0.231373 0.380392 0.705882 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="0 0 0" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Aronachnaq_rim__Revolve2.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="aronachnaq_rim__revolve2_2">
         <inertial>
@@ -246,6 +330,12 @@
                 <color rgba="0.231373 0.380392 0.705882 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="0 0 0" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Aronachnaq_rim__Revolve2.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="aronachnaq_rim__revolve2_3">
         <inertial>
@@ -262,6 +352,12 @@
                 <color rgba="0.231373 0.380392 0.705882 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="0 0 0" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Aronachnaq_rim__Revolve2.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="aronachnaq_rim__revolve2__1__loop_closure">
         <inertial>
@@ -299,6 +395,12 @@
                 <color rgba="0.972549 0.529412 0.00392157 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="0 0 0" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Aronachnaq_tyre__Fillet27.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="aronachnaq_tyre__fillet27_1">
         <inertial>
@@ -315,6 +417,12 @@
                 <color rgba="0.972549 0.529412 0.00392157 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="0 0 0" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Aronachnaq_tyre__Fillet27.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="aronachnaq_tyre__fillet27_2">
         <inertial>
@@ -331,6 +439,12 @@
                 <color rgba="0.972549 0.529412 0.00392157 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="0 0 0" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Aronachnaq_tyre__Fillet27.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="aronachnaq_tyre__fillet27_3">
         <inertial>
@@ -347,6 +461,12 @@
                 <color rgba="0.972549 0.529412 0.00392157 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="0 0 0" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Aronachnaq_tyre__Fillet27.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="aronachnaq_tyre__fillet27__2__loop_closure">
         <inertial>
@@ -370,6 +490,12 @@
                 <color rgba="0.498039 0.498039 0.498039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="2.26912e-13 -2.36572e-14 0.02305" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/BJJ02040274_GL60II_______1_solid1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="bjj02040274_gl60ii_Å_à_Ç_1_solid1_1">
         <inertial>
@@ -386,6 +512,12 @@
                 <color rgba="0.498039 0.498039 0.498039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="2.26912e-13 -2.36572e-14 0.02255" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/BJJ02040274_GL60II_______1_solid1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="gb_fastener_screws_hshcs_m3x5_s_1_solid1">
         <inertial>
@@ -402,6 +534,12 @@
                 <color rgba="0.768627 0.886275 0.952941 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="0 0 0" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/GB_FASTENER_SCREWS_HSHCS_M3X5_S_1_solid1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="gb_fastener_screws_hshcs_m3x5_s_1_solid1_1">
         <inertial>
@@ -418,6 +556,12 @@
                 <color rgba="0.768627 0.886275 0.952941 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="0 0 0" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/GB_FASTENER_SCREWS_HSHCS_M3X5_S_1_solid1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="gb_fastener_screws_hshcs_m3x5_s_2_solid1">
         <inertial>
@@ -434,6 +578,12 @@
                 <color rgba="0.972549 0.529412 0.00392157 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="0 0 0" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/GB_FASTENER_SCREWS_HSHCS_M3X5_S_2_solid1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="gb_fastener_screws_hshcs_m3x5_s_2_solid1_1">
         <inertial>
@@ -450,6 +600,12 @@
                 <color rgba="0.972549 0.529412 0.00392157 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="0 0 0" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/GB_FASTENER_SCREWS_HSHCS_M3X5_S_2_solid1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="gb_fastener_screws_hshcs_m3x5_s_4_solid1">
         <inertial>
@@ -466,6 +622,12 @@
                 <color rgba="0.498039 0.498039 0.498039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="0 0 0" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/GB_FASTENER_SCREWS_HSHCS_M3X5_S_4_solid1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="gb_fastener_screws_hshcs_m3x5_s_4_solid1_1">
         <inertial>
@@ -482,6 +644,12 @@
                 <color rgba="0.498039 0.498039 0.498039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="0 0 0" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/GB_FASTENER_SCREWS_HSHCS_M3X5_S_4_solid1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="gl60_v1_0_240806a_1_solid86">
         <inertial>
@@ -498,6 +666,12 @@
                 <color rgba="0.231373 0.380392 0.705882 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="0 0 0" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/GL60_V1_0_240806A_1_solid86.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="gl60_v1_0_240806a_1_solid86_1">
         <inertial>
@@ -514,6 +688,12 @@
                 <color rgba="0.231373 0.380392 0.705882 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="0 0 0" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/GL60_V1_0_240806A_1_solid86.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="gl60_v1_0_240806a_1_solid86__1__loop_closure">
         <inertial>
@@ -544,6 +724,12 @@
                 <color rgba="0.917647 0.917647 0.917647 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="0 0 0" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/GL60_V1_0_240806A_1_solid87.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="gl60_v1_0_240806a_1_solid87_1">
         <inertial>
@@ -560,6 +746,12 @@
                 <color rgba="0.917647 0.917647 0.917647 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="0 0 0" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/GL60_V1_0_240806A_1_solid87.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="hex_screw_gradeab_iso_iso_4017___m20_x_45_n__headfillet">
         <inertial>
@@ -576,6 +768,12 @@
                 <color rgba="0.498039 0.498039 0.498039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="0 0 0" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/hex_screw_gradeab_iso_ISO_4017___M20_x_45_N__HeadFillet.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="hex_screw_gradeab_iso_iso_4017___m20_x_45_n__headfillet_1">
         <inertial>
@@ -592,6 +790,12 @@
                 <color rgba="0.498039 0.498039 0.498039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="0 0 0" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/hex_screw_gradeab_iso_ISO_4017___M20_x_45_N__HeadFillet.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="hex_screw_gradeab_iso_iso_4017___m20_x_45_n__headfillet_2">
         <inertial>
@@ -608,6 +812,12 @@
                 <color rgba="0.498039 0.498039 0.498039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="0 0 0" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/hex_screw_gradeab_iso_ISO_4017___M20_x_45_N__HeadFillet.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="hex_screw_gradeab_iso_iso_4017___m20_x_45_n__headfillet_3">
         <inertial>
@@ -624,6 +834,12 @@
                 <color rgba="0.498039 0.498039 0.498039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="0 0 0" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/hex_screw_gradeab_iso_ISO_4017___M20_x_45_N__HeadFillet.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="m3_ÂÝÎÆ__1">
         <inertial>
@@ -640,6 +856,12 @@
                 <color rgba="0.615686 0.811765 0.929412 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="0 0 0" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/M3_______1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="m3_ÂÝÎÆ__1_1">
         <inertial>
@@ -656,6 +878,12 @@
                 <color rgba="0.615686 0.811765 0.929412 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="0 0 0" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/M3_______1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="none">
         <inertial>
@@ -669,6 +897,12 @@
                 <mesh filename="package://assembly_2/meshes/NONE.stl" scale="1 1 1" />
             </geometry>
         </visual>
+        <collision>
+            <origin xyz="0 0 0" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/NONE.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="none_1">
         <inertial>
@@ -685,6 +919,12 @@
                 <color rgba="0.980392 0.713726 0.00392157 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="0 0 0" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/NONE_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="none_2">
         <inertial>
@@ -698,6 +938,12 @@
                 <mesh filename="package://assembly_2/meshes/NONE.stl" scale="1 1 1" />
             </geometry>
         </visual>
+        <collision>
+            <origin xyz="0 0 0" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/NONE.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="none_3">
         <inertial>
@@ -714,6 +960,12 @@
                 <color rgba="0.980392 0.713726 0.00392157 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="0 0 0" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/NONE_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="none__2_">
         <inertial>
@@ -758,6 +1010,12 @@
                 <color rgba="0.980392 0.713726 0.00392157 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="0 0 0" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Nut_M20__M20_Tapped_Hole1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="nut_m20__m20_tapped_hole1_1">
         <inertial>
@@ -774,6 +1032,12 @@
                 <color rgba="0.980392 0.713726 0.00392157 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="0 0 0" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Nut_M20__M20_Tapped_Hole1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="nut_m20__m20_tapped_hole1_2">
         <inertial>
@@ -790,6 +1054,12 @@
                 <color rgba="0.980392 0.713726 0.00392157 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="0 0 0" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Nut_M20__M20_Tapped_Hole1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="nut_m20__m20_tapped_hole1_3">
         <inertial>
@@ -806,6 +1076,12 @@
                 <color rgba="0.980392 0.713726 0.00392157 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="0 0 0" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Nut_M20__M20_Tapped_Hole1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1">
         <inertial>
@@ -822,6 +1098,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="0 0 0" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_1">
         <inertial>
@@ -838,6 +1120,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="-1.73472e-18 0 0" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_10">
         <inertial>
@@ -854,6 +1142,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="0 0 0" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_100">
         <inertial>
@@ -870,6 +1164,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="-1.73472e-18 0 0.04" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_101">
         <inertial>
@@ -886,6 +1186,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="0 0 0" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_102">
         <inertial>
@@ -902,6 +1208,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="0.015 0.0088 0.02" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_103">
         <inertial>
@@ -918,6 +1230,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="-1.73472e-18 0 0" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_104">
         <inertial>
@@ -934,6 +1252,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="0 0 0" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_105">
         <inertial>
@@ -950,6 +1274,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="-1.73472e-18 0 0" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_106">
         <inertial>
@@ -966,6 +1296,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="-1.73472e-18 0 0" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_107">
         <inertial>
@@ -982,6 +1318,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="-1.73472e-18 0 0.04" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_108">
         <inertial>
@@ -998,6 +1340,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="-1.73472e-18 0 0" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_109">
         <inertial>
@@ -1014,6 +1362,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="-1.73472e-18 0 0.04" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_11">
         <inertial>
@@ -1030,6 +1384,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="-1.73472e-18 0 0.04" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_110">
         <inertial>
@@ -1046,6 +1406,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="-1.73472e-18 0 0.04" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_111">
         <inertial>
@@ -1062,6 +1428,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="-1.73472e-18 0 0" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_112">
         <inertial>
@@ -1078,6 +1450,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="-1.73472e-18 0 0" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_113">
         <inertial>
@@ -1094,6 +1472,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="-1.73472e-18 0 0" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_114">
         <inertial>
@@ -1110,6 +1494,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="-1.73472e-18 0 0.04" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_115">
         <inertial>
@@ -1126,6 +1516,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="-1.73472e-18 0 0" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_116">
         <inertial>
@@ -1142,6 +1538,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="-1.73472e-18 0 0" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_117">
         <inertial>
@@ -1158,6 +1560,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="-1.73472e-18 0 0" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_118">
         <inertial>
@@ -1174,6 +1582,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="-1.73472e-18 0 0.04" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_119">
         <inertial>
@@ -1190,6 +1604,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="0 0 0" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_12">
         <inertial>
@@ -1206,6 +1626,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="-1.73472e-18 0 0.04" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_120">
         <inertial>
@@ -1222,6 +1648,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="0.015 -0.0088 0.02" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_121">
         <inertial>
@@ -1238,6 +1670,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="0 0 0" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_122">
         <inertial>
@@ -1254,6 +1692,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="-1.73472e-18 0 0" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_123">
         <inertial>
@@ -1270,6 +1714,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="-1.73472e-18 0 0" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_124">
         <inertial>
@@ -1286,6 +1736,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="-1.73472e-18 0 0.04" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_125">
         <inertial>
@@ -1302,6 +1758,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="-1.73472e-18 0 0" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_126">
         <inertial>
@@ -1318,6 +1780,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="0 0 0" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_127">
         <inertial>
@@ -1334,6 +1802,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="-1.73472e-18 0 0" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_128">
         <inertial>
@@ -1350,6 +1824,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="-1.73472e-18 0 0.04" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_129">
         <inertial>
@@ -1366,6 +1846,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="-1.73472e-18 0 0" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_13">
         <inertial>
@@ -1382,6 +1868,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="0.015 -0.0088 0" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_130">
         <inertial>
@@ -1398,6 +1890,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="-1.73472e-18 0 0.04" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_131">
         <inertial>
@@ -1414,6 +1912,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="-1.73472e-18 0 0" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_132">
         <inertial>
@@ -1430,6 +1934,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="-1.73472e-18 0 0.04" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_133">
         <inertial>
@@ -1446,6 +1956,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="-1.73472e-18 0 0.04" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_134">
         <inertial>
@@ -1462,6 +1978,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="-1.73472e-18 0 0" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_135">
         <inertial>
@@ -1478,6 +2000,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="-1.73472e-18 0 0" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_136">
         <inertial>
@@ -1494,6 +2022,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="-0.0088 -0.015 0" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_137">
         <inertial>
@@ -1510,6 +2044,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="-1.73472e-18 0 0.04" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_138">
         <inertial>
@@ -1526,6 +2066,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="-1.73472e-18 0 0" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_139">
         <inertial>
@@ -1542,6 +2088,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="-1.73472e-18 0 0" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_14">
         <inertial>
@@ -1558,6 +2110,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="-1.73472e-18 0 0.04" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_140">
         <inertial>
@@ -1574,6 +2132,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="-1.73472e-18 0 0.04" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_141">
         <inertial>
@@ -1590,6 +2154,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="-1.73472e-18 0 0.04" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_142">
         <inertial>
@@ -1606,6 +2176,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="-1.73472e-18 0 0" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_143">
         <inertial>
@@ -1622,6 +2198,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="-1.73472e-18 0 0.04" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_144">
         <inertial>
@@ -1638,6 +2220,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="0 0 0" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_145">
         <inertial>
@@ -1654,6 +2242,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="-1.73472e-18 0 0.04" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_146">
         <inertial>
@@ -1670,6 +2264,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="-1.73472e-18 0 0" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_147">
         <inertial>
@@ -1686,6 +2286,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="-1.73472e-18 0 0" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_148">
         <inertial>
@@ -1702,6 +2308,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="-1.73472e-18 0 0" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_149">
         <inertial>
@@ -1718,6 +2330,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="-1.73472e-18 0 0" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_15">
         <inertial>
@@ -1734,6 +2352,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="-1.73472e-18 0 0.04" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_150">
         <inertial>
@@ -1750,6 +2374,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="-1.73472e-18 0 0.04" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_151">
         <inertial>
@@ -1766,6 +2396,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="-1.73472e-18 0 0.04" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_152">
         <inertial>
@@ -1782,6 +2418,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="-1.73472e-18 0 0.04" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_153">
         <inertial>
@@ -1798,6 +2440,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="-1.73472e-18 0 0" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_154">
         <inertial>
@@ -1814,6 +2462,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="-1.73472e-18 0 0.04" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_155">
         <inertial>
@@ -1830,6 +2484,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="-1.73472e-18 0 0.04" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_156">
         <inertial>
@@ -1846,6 +2506,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="0 0 0" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_157">
         <inertial>
@@ -1862,6 +2528,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="-1.73472e-18 0 0" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_158">
         <inertial>
@@ -1878,6 +2550,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="-0.0088 0.015 0" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_159">
         <inertial>
@@ -1894,6 +2572,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="0 0 0" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_16">
         <inertial>
@@ -1910,6 +2594,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="-1.73472e-18 0 0" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_160">
         <inertial>
@@ -1926,6 +2616,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="-1.73472e-18 0 0" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_161">
         <inertial>
@@ -1942,6 +2638,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="-1.73472e-18 0 0.04" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_162">
         <inertial>
@@ -1958,6 +2660,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="-1.73472e-18 0 0" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_163">
         <inertial>
@@ -1974,6 +2682,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="-1.73472e-18 0 0.04" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_164">
         <inertial>
@@ -1990,6 +2704,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="0 0 0" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_165">
         <inertial>
@@ -2006,6 +2726,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="-1.73472e-18 0 0.04" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_166">
         <inertial>
@@ -2022,6 +2748,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="-1.73472e-18 0 0.04" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_167">
         <inertial>
@@ -2038,6 +2770,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="-1.73472e-18 0 0" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_168">
         <inertial>
@@ -2054,6 +2792,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="-0.015 -0.0088 0.04" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_169">
         <inertial>
@@ -2070,6 +2814,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="-1.73472e-18 0 0.04" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_17">
         <inertial>
@@ -2086,6 +2836,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="-1.73472e-18 0 0" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_170">
         <inertial>
@@ -2102,6 +2858,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="-1.73472e-18 0 0" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_171">
         <inertial>
@@ -2118,6 +2880,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="-1.73472e-18 0 0" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_172">
         <inertial>
@@ -2134,6 +2902,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="-1.73472e-18 0 0.04" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_173">
         <inertial>
@@ -2150,6 +2924,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="0 0 0" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_174">
         <inertial>
@@ -2166,6 +2946,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="0.0055 0.000499993 2.7367e-06" rpy="0.00547343 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_175">
         <inertial>
@@ -2182,6 +2968,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="0 0 0" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_176">
         <inertial>
@@ -2198,6 +2990,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="-0.0088 0.015 0" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_177">
         <inertial>
@@ -2214,6 +3012,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="0 0 0" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_178">
         <inertial>
@@ -2230,6 +3034,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="0.0088 0.015 0.04" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_179">
         <inertial>
@@ -2246,6 +3056,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="-1.73472e-18 0 0.04" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_18">
         <inertial>
@@ -2262,6 +3078,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="-1.73472e-18 0 0.04" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_180">
         <inertial>
@@ -2278,6 +3100,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="-1.73472e-18 0 0" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_181">
         <inertial>
@@ -2294,6 +3122,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="-1.73472e-18 0 0" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_182">
         <inertial>
@@ -2310,6 +3144,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="-1.73472e-18 0 0.04" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_183">
         <inertial>
@@ -2326,6 +3166,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="-1.73472e-18 0 0" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_184">
         <inertial>
@@ -2342,6 +3188,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="-1.73472e-18 0 0" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_185">
         <inertial>
@@ -2358,6 +3210,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="-1.73472e-18 0 0" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_186">
         <inertial>
@@ -2374,6 +3232,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="-1.73472e-18 0 0.04" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_187">
         <inertial>
@@ -2390,6 +3254,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="0 0 0" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_188">
         <inertial>
@@ -2406,6 +3276,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="-1.73472e-18 0 0.04" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_189">
         <inertial>
@@ -2422,6 +3298,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="-1.73472e-18 0 0" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_19">
         <inertial>
@@ -2438,6 +3320,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="0 0 0" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_190">
         <inertial>
@@ -2454,6 +3342,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="-1.73472e-18 0 0.04" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_191">
         <inertial>
@@ -2470,6 +3364,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="-1.73472e-18 0 0" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_192">
         <inertial>
@@ -2486,6 +3386,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="-1.73472e-18 0 0" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_193">
         <inertial>
@@ -2502,6 +3408,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="-1.73472e-18 0 0.04" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_194">
         <inertial>
@@ -2518,6 +3430,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="-1.73472e-18 0 0" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_195">
         <inertial>
@@ -2534,6 +3452,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="-1.73472e-18 0 0.04" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_196">
         <inertial>
@@ -2550,6 +3474,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="-1.73472e-18 0 0.04" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_197">
         <inertial>
@@ -2566,6 +3496,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="-1.73472e-18 0 0" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_198">
         <inertial>
@@ -2582,6 +3518,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="-1.73472e-18 0 0" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_199">
         <inertial>
@@ -2598,6 +3540,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="-0.0088 0.015 0" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_2">
         <inertial>
@@ -2614,6 +3562,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="0.015 0.0088 0.02" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_20">
         <inertial>
@@ -2630,6 +3584,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="-1.73472e-18 0 0.04" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_200">
         <inertial>
@@ -2646,6 +3606,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="-1.73472e-18 0 0" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_201">
         <inertial>
@@ -2662,6 +3628,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="-1.73472e-18 0 0.04" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_202">
         <inertial>
@@ -2678,6 +3650,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="-0.0088 -0.015 0" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_203">
         <inertial>
@@ -2694,6 +3672,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="-1.73472e-18 0 0" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_204">
         <inertial>
@@ -2710,6 +3694,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="-1.73472e-18 0 0" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_205">
         <inertial>
@@ -2726,6 +3716,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="-1.73472e-18 0 0.04" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_206">
         <inertial>
@@ -2742,6 +3738,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="-1.73472e-18 0 0.04" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_207">
         <inertial>
@@ -2758,6 +3760,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="0 0 0" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_208">
         <inertial>
@@ -2774,6 +3782,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="-1.73472e-18 0 0.04" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_209">
         <inertial>
@@ -2790,6 +3804,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="0 0 0" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_21">
         <inertial>
@@ -2806,6 +3826,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="-1.73472e-18 0 0.04" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_210">
         <inertial>
@@ -2822,6 +3848,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="-1.73472e-18 0 0.04" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_211">
         <inertial>
@@ -2838,6 +3870,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="-1.73472e-18 0 0.04" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_212">
         <inertial>
@@ -2854,6 +3892,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="-1.73472e-18 0 0.04" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_213">
         <inertial>
@@ -2870,6 +3914,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="-1.73472e-18 0 0" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_214">
         <inertial>
@@ -2886,6 +3936,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="-1.73472e-18 0 0" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_215">
         <inertial>
@@ -2902,6 +3958,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="-1.73472e-18 0 0" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_216">
         <inertial>
@@ -2918,6 +3980,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="-1.73472e-18 0 0.04" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_217">
         <inertial>
@@ -2934,6 +4002,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="-1.73472e-18 0 0" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_218">
         <inertial>
@@ -2950,6 +4024,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="-1.73472e-18 0 0.04" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_219">
         <inertial>
@@ -2966,6 +4046,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="-1.73472e-18 0 0" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_22">
         <inertial>
@@ -2982,6 +4068,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="0 0 0" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_220">
         <inertial>
@@ -2998,6 +4090,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="-1.73472e-18 0 0" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_221">
         <inertial>
@@ -3014,6 +4112,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="-1.73472e-18 0 0.04" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_222">
         <inertial>
@@ -3030,6 +4134,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="-1.73472e-18 0 0.04" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_223">
         <inertial>
@@ -3046,6 +4156,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="-1.73472e-18 0 0.04" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_224">
         <inertial>
@@ -3062,6 +4178,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="-1.73472e-18 0 0.04" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_225">
         <inertial>
@@ -3078,6 +4200,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="-1.73472e-18 0 0.04" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_226">
         <inertial>
@@ -3094,6 +4222,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="-1.73472e-18 0 0" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_227">
         <inertial>
@@ -3110,6 +4244,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="-1.73472e-18 0 0" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_228">
         <inertial>
@@ -3126,6 +4266,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="-1.73472e-18 0 0.04" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_229">
         <inertial>
@@ -3142,6 +4288,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="-0.0088 -0.015 0.04" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_23">
         <inertial>
@@ -3158,6 +4310,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="-1.73472e-18 0 0.04" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_230">
         <inertial>
@@ -3174,6 +4332,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="-1.73472e-18 0 0" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_231">
         <inertial>
@@ -3190,6 +4354,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="-1.73472e-18 0 0.04" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_232">
         <inertial>
@@ -3206,6 +4376,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="-1.73472e-18 0 0" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_233">
         <inertial>
@@ -3222,6 +4398,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="-1.73472e-18 0 0.04" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_234">
         <inertial>
@@ -3238,6 +4420,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="-1.73472e-18 0 0" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_235">
         <inertial>
@@ -3254,6 +4442,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="0.0088 -0.015 0" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_24">
         <inertial>
@@ -3270,6 +4464,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="-1.73472e-18 0 0" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_25">
         <inertial>
@@ -3286,6 +4486,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="-1.73472e-18 0 0" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_26">
         <inertial>
@@ -3302,6 +4508,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="-1.73472e-18 0 0" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_27">
         <inertial>
@@ -3318,6 +4530,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="-1.73472e-18 0 0" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_28">
         <inertial>
@@ -3334,6 +4552,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="-1.73472e-18 0 0" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_29">
         <inertial>
@@ -3350,6 +4574,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="0 0 0" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_3">
         <inertial>
@@ -3366,6 +4596,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="-1.73472e-18 0 0" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_30">
         <inertial>
@@ -3382,6 +4618,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="-1.73472e-18 0 0" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_31">
         <inertial>
@@ -3398,6 +4640,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="-1.73472e-18 0 0.04" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_32">
         <inertial>
@@ -3414,6 +4662,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="-1.73472e-18 0 0" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_33">
         <inertial>
@@ -3430,6 +4684,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="-1.73472e-18 0 0" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_34">
         <inertial>
@@ -3446,6 +4706,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="-1.73472e-18 0 0" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_35">
         <inertial>
@@ -3462,6 +4728,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="-1.73472e-18 0 0" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_36">
         <inertial>
@@ -3478,6 +4750,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="0.015 -0.0088 0.02" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_37">
         <inertial>
@@ -3494,6 +4772,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="-1.73472e-18 0 0.04" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_38">
         <inertial>
@@ -3510,6 +4794,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="0 0 0" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_39">
         <inertial>
@@ -3526,6 +4816,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="-1.73472e-18 0 0" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_4">
         <inertial>
@@ -3542,6 +4838,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="0 0 0" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_40">
         <inertial>
@@ -3558,6 +4860,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="0 0 0" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_41">
         <inertial>
@@ -3574,6 +4882,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="0 0 0" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_42">
         <inertial>
@@ -3590,6 +4904,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="-1.73472e-18 0 0" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_43">
         <inertial>
@@ -3606,6 +4926,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="-1.73472e-18 0 0.04" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_44">
         <inertial>
@@ -3622,6 +4948,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="-1.73472e-18 0 0.04" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_45">
         <inertial>
@@ -3638,6 +4970,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="-1.73472e-18 0 0" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_46">
         <inertial>
@@ -3654,6 +4992,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="0 0 0" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_47">
         <inertial>
@@ -3670,6 +5014,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="-1.73472e-18 0 0.04" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_48">
         <inertial>
@@ -3686,6 +5036,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="0.0005 0.0055 0.02" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_49">
         <inertial>
@@ -3702,6 +5058,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="-1.73472e-18 0 0" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_5">
         <inertial>
@@ -3718,6 +5080,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="-1.73472e-18 0 0.04" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_50">
         <inertial>
@@ -3734,6 +5102,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="-1.73472e-18 0 0" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_51">
         <inertial>
@@ -3750,6 +5124,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="-0.0088 -0.015 0" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_52">
         <inertial>
@@ -3766,6 +5146,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="-0.0088 0.015 0.04" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_53">
         <inertial>
@@ -3782,6 +5168,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="-1.73472e-18 0 0.04" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_54">
         <inertial>
@@ -3798,6 +5190,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="-1.73472e-18 0 0.04" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_55">
         <inertial>
@@ -3814,6 +5212,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="-1.73472e-18 0 0.04" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_56">
         <inertial>
@@ -3830,6 +5234,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="-1.73472e-18 0 0.04" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_57">
         <inertial>
@@ -3846,6 +5256,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="0 0 0" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_58">
         <inertial>
@@ -3862,6 +5278,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="-1.73472e-18 0 0" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_59">
         <inertial>
@@ -3878,6 +5300,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="-0.0088 0.015 0.04" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_6">
         <inertial>
@@ -3894,6 +5322,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="-0.0088 0.015 0" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_60">
         <inertial>
@@ -3910,6 +5344,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="-1.73472e-18 0 0" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_61">
         <inertial>
@@ -3926,6 +5366,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="-1.73472e-18 0 0" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_62">
         <inertial>
@@ -3942,6 +5388,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="0.0088 -0.015 0" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_63">
         <inertial>
@@ -3958,6 +5410,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="-1.73472e-18 0 0" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_64">
         <inertial>
@@ -3974,6 +5432,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="-1.73472e-18 0 0" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_65">
         <inertial>
@@ -3990,6 +5454,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="-1.73472e-18 0 0" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_66">
         <inertial>
@@ -4006,6 +5476,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="-1.73472e-18 0 0.04" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_67">
         <inertial>
@@ -4022,6 +5498,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="-1.73472e-18 0 0" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_68">
         <inertial>
@@ -4038,6 +5520,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="-1.73472e-18 0 0.04" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_69">
         <inertial>
@@ -4054,6 +5542,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="-1.73472e-18 0 0" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_7">
         <inertial>
@@ -4070,6 +5564,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="-1.73472e-18 0 0.04" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_70">
         <inertial>
@@ -4086,6 +5586,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="-1.73472e-18 0 0.04" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_71">
         <inertial>
@@ -4102,6 +5608,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="-1.73472e-18 0 0" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_72">
         <inertial>
@@ -4118,6 +5630,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="-1.73472e-18 0 0" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_73">
         <inertial>
@@ -4134,6 +5652,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="-1.73472e-18 0 0.04" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_74">
         <inertial>
@@ -4150,6 +5674,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="0.015 -0.0088 0.02" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_75">
         <inertial>
@@ -4166,6 +5696,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="-1.73472e-18 0 0.04" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_76">
         <inertial>
@@ -4182,6 +5718,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="-1.73472e-18 0 0.04" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_77">
         <inertial>
@@ -4198,6 +5740,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="-1.73472e-18 0 0" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_78">
         <inertial>
@@ -4214,6 +5762,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="0 0 0" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_79">
         <inertial>
@@ -4230,6 +5784,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="-1.73472e-18 0 0.04" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_8">
         <inertial>
@@ -4246,6 +5806,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="-1.73472e-18 0 0" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_80">
         <inertial>
@@ -4262,6 +5828,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="-1.73472e-18 0 0.04" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_81">
         <inertial>
@@ -4278,6 +5850,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="-1.73472e-18 0 0" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_82">
         <inertial>
@@ -4294,6 +5872,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="-1.73472e-18 0 0.04" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_83">
         <inertial>
@@ -4310,6 +5894,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="-1.73472e-18 0 0.04" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_84">
         <inertial>
@@ -4326,6 +5916,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="-0.0088 -0.015 0" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_85">
         <inertial>
@@ -4342,6 +5938,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="0 0 0" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_86">
         <inertial>
@@ -4358,6 +5960,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="0 0 0" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_87">
         <inertial>
@@ -4374,6 +5982,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="-1.73472e-18 0 0" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_88">
         <inertial>
@@ -4390,6 +6004,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="-1.73472e-18 0 0.04" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_89">
         <inertial>
@@ -4406,6 +6026,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="-1.73472e-18 0 0.04" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_9">
         <inertial>
@@ -4422,6 +6048,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="0 0 0" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_90">
         <inertial>
@@ -4438,6 +6070,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="-1.73472e-18 0 0" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_91">
         <inertial>
@@ -4454,6 +6092,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="-1.73472e-18 0 0.04" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_92">
         <inertial>
@@ -4470,6 +6114,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="-1.73472e-18 0 0" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_93">
         <inertial>
@@ -4486,6 +6136,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="0 0 0" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_94">
         <inertial>
@@ -4502,6 +6158,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="-1.73472e-18 0 0" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_95">
         <inertial>
@@ -4518,6 +6180,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="-1.73472e-18 0 0" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_96">
         <inertial>
@@ -4534,6 +6202,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="-0.0088 0.015 0" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_97">
         <inertial>
@@ -4550,6 +6224,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="-1.73472e-18 0 0.04" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_98">
         <inertial>
@@ -4566,6 +6246,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="-1.73472e-18 0 0" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1_99">
         <inertial>
@@ -4582,6 +6268,12 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="-1.73472e-18 0 0" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Part_1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="part_1__100__loop_closure">
         <inertial>
@@ -4795,6 +6487,12 @@
                 <color rgba="0.768627 0.886275 0.952941 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="0 0 0" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Washer_M20__Boss_Extrude1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="washer_m20__boss_extrude1_1">
         <inertial>
@@ -4811,6 +6509,12 @@
                 <color rgba="0.768627 0.886275 0.952941 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="0 0 0" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Washer_M20__Boss_Extrude1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="washer_m20__boss_extrude1_2">
         <inertial>
@@ -4827,6 +6531,12 @@
                 <color rgba="0.768627 0.886275 0.952941 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="0 0 0" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Washer_M20__Boss_Extrude1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <link name="washer_m20__boss_extrude1_3">
         <inertial>
@@ -4843,6 +6553,12 @@
                 <color rgba="0.768627 0.886275 0.952941 1" />
             </material>
         </visual>
+        <collision>
+            <origin xyz="0 0 0" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://assembly_2/meshes/Washer_M20__Boss_Extrude1.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
     </link>
     <joint name="fastened_1" type="fixed">
         <origin xyz="0.0088 0.015 -0.04" rpy="1.5708 3.28427e-15 3.14159" />
