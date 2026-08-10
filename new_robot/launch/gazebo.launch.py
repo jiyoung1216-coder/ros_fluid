@@ -33,7 +33,7 @@ def generate_launch_description():
                 'gz_sim.launch.py',
             )
         ),
-        launch_arguments={'gz_args': '-r empty.sdf'}.items(),
+        launch_arguments={'gz_args': 'empty.sdf'}.items(),
     )
 
     robot_state_publisher = Node(
@@ -50,8 +50,8 @@ def generate_launch_description():
             '-topic', 'robot_description',
             '-name', 'new_robot',
             '-x', '0', '-y', '0', '-z', '0.5',
-            '-R', '0',
-            '-P', '-1.5708',
+            '-R', '-1.57079632679',
+            '-P', '1.57079632679',
             '-Y', '0',
         ],
         output='screen',
@@ -71,6 +71,13 @@ def generate_launch_description():
         output='screen',
     )
 
+    odom_bridge = Node(
+        package='ros_gz_bridge',
+        executable='parameter_bridge',
+        arguments=['/model/new_robot/odometry@nav_msgs/msg/Odometry[gz.msgs.Odometry'],
+        output='screen',
+    )
+
     return LaunchDescription([
         set_resource_path,
         gz_sim,
@@ -78,4 +85,5 @@ def generate_launch_description():
         spawn_entity,
         clock_bridge,
         cmd_vel_bridge,
+        odom_bridge,
     ])

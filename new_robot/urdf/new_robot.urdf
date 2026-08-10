@@ -2,10 +2,10 @@
 <robot name="new_robot">
     <gazebo>
         <plugin filename="gz-sim-diff-drive-system" name="gz::sim::systems::DiffDrive">
-            <left_joint>revolute_3</left_joint>
-            <left_joint>revolute_4</left_joint>
-            <right_joint>revolute_5</right_joint>
-            <right_joint>revolute_6</right_joint>
+            <left_joint>revolute_5</left_joint>
+            <left_joint>revolute_6</left_joint>
+            <right_joint>revolute_3</right_joint>
+            <right_joint>revolute_4</right_joint>
             <wheel_separation>0.5201</wheel_separation>
             <wheel_radius>0.105</wheel_radius>
             <odom_publish_frequency>20</odom_publish_frequency>
@@ -1852,5 +1852,33 @@
         <axis xyz="-0 -0 -1" />
         <parent link="Колісний_диск" />
         <child link="Шина700_3" />
+    </joint>
+    <link name="water_tank">
+        <inertial>
+            <mass value="2e-05" />
+            <origin xyz="0 0 0" rpy="0 0 0" />
+            <inertia ixx="7.2e-08" ixy="0" ixz="0" iyy="7.2e-08" iyz="0" izz="3.6e-08" />
+        </inertial>
+        <visual>
+            <origin xyz="0 0 0" rpy="0 0 0" />
+            <geometry>
+                <mesh filename="package://new_robot/meshes/water_tank.stl" scale="1 1 1" />
+            </geometry>
+            <material name="water_tank_blue">
+                <color rgba="0.2 0.5 0.9 1" />
+            </material>
+        </visual>
+        <collision>
+            <origin xyz="0 0 0" rpy="0 0 0" />
+            <geometry>
+                <mesh filename="package://new_robot/meshes/water_tank.stl" scale="1 1 1" />
+            </geometry>
+        </collision>
+    </link>
+
+    <joint name="water_tank_joint" type="fixed">
+        <origin xyz="-0.515032 0.292627 -0.0950903" rpy="0 -1.5708 0" />
+        <parent link="root" />
+        <child link="water_tank" />
     </joint>
 </robot>
