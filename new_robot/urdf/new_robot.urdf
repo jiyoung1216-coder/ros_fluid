@@ -13,7 +13,32 @@
             <frame_id>odom</frame_id>
             <child_frame_id>root</child_frame_id>
         </plugin>
+            <plugin filename="gz-sim-joint-position-controller-system" name="gz::sim::systems::JointPositionController">
+            <joint_name>revolute_1</joint_name>
+            <topic>/gimbal_roll_cmd</topic>
+            <p_gain>20</p_gain>
+            <i_gain>0</i_gain>
+            <d_gain>1.5</d_gain>
+        </plugin>
+            <plugin filename="gz-sim-joint-position-controller-system" name="gz::sim::systems::JointPositionController">
+            <joint_name>revolute_2</joint_name>
+            <topic>/gimbal_pitch_cmd</topic>
+            <p_gain>20</p_gain>
+            <i_gain>0</i_gain>
+            <d_gain>1.5</d_gain>
+        </plugin>
+
+        <plugin filename="gz-sim-imu-system" name="gz::sim::systems::Imu"></plugin>
+        
     </gazebo>
+    <gazebo reference="root">
+        <sensor name="chassis_imu" type="imu">
+            <always_on>true</always_on>
+            <update_rate>50</update_rate>
+            <topic>imu</topic>
+        </sensor>
+    </gazebo>
+
     <link name="bjj02040274_gl60ii_Å_à_Ç_1_solid1">
         <inertial>
             <mass value="6.7357e-06" />
@@ -1793,41 +1818,50 @@
         <parent link="root" />
         <child link="body2_3" />
     </joint>
-    <joint name="revolute_1" type="fixed">
+    <joint name="revolute_1" type="revolute">
         <origin xyz="-2.26874e-13 2.36478e-14 0.0103" rpy="1.23034e-16 -1.5139e-16 0.0617162" />
         <axis xyz="-0 -0 -1" />
         <parent link="m3_ÂÝÎÆ__1" />
         <child link="default_4" />
+        <limit lower="-0.4363" upper="0.4363" effort="10" velocity="3.0" />
+        <dynamics damping="0.2" friction="0.05" />
     </joint>
-    <joint name="revolute_2" type="fixed">
+    <joint name="revolute_2" type="revolute">
         <origin xyz="-2.26874e-13 2.35922e-14 0.0103" rpy="-1.5708 8.67362e-17 0.0184253" />
         <axis xyz="-0 1 -0" />
         <parent link="m3_ÂÝÎÆ__1_1" />
         <child link="default_7" />
+        <limit lower="-0.4363" upper="0.4363" effort="10" velocity="3.0" />
+        <dynamics damping="0.2" friction="0.05" />
     </joint>
     <joint name="revolute_3" type="continuous">
         <origin xyz="0.0345368 0.252 0.0089941" rpy="-1.5708 -0 1.5708" />
         <axis xyz="0 0 1" />
         <parent link="body2_1" />
         <child link="part_1_1" />
+        <dynamics damping="0.02" friction="0.01" />
     </joint>
     <joint name="revolute_4" type="continuous">
         <origin xyz="0.0345368 0.252 0.0089941" rpy="-1.5708 -0.00700221 1.5708" />
         <axis xyz="-0 -0 1" />
         <parent link="body2" />
         <child link="part_1_13" />
+        <dynamics damping="0.02" friction="0.01" />
     </joint>
     <joint name="revolute_5" type="continuous">
         <origin xyz="-0.0354632 0.252 0.0089941" rpy="1.5708 1.56379 1.5708" />
         <axis xyz="0 0 -1" />
         <parent link="body2_2" />
         <child link="part_1_12" />
+        <dynamics damping="0.02" friction="0.01" />
     </joint>
     <joint name="revolute_6" type="continuous">
         <origin xyz="-0.0348857 0.252 7.75906e-05" rpy="-1.5708 3.33067e-16 1.5708" />
         <axis xyz="0 0 1" />
         <parent link="body2_3" />
         <child link="part_1_9" />
+        <dynamics damping="0.02" friction="0.01" />
+        
     </joint>
     <joint name="wheel_1_fastened_joint" type="fixed">
         <origin xyz="-0.0891082 -2.77556e-17 0" rpy="0 -0 0" />
@@ -1876,9 +1910,10 @@
         </collision>
     </link>
 
+<!-- 수정 후 -->
     <joint name="water_tank_joint" type="fixed">
-        <origin xyz="-0.515032 0.292627 -0.0950903" rpy="0 -1.5708 0" />
-        <parent link="root" />
+        <origin xyz="-0.115419 0.019334 0.169057" rpy="0.000498 1.545365 3.080375" />
+        <parent link="default_4" />
         <child link="water_tank" />
     </joint>
 </robot>

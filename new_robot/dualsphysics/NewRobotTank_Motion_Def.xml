@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+  NewRobotTank_Motion_Def.xml
+  new_robot(가제보)에서 실제 주행시켜 뽑은 가속도 프로파일을 AccInput으로
+  물 입자에 직접 주입하는 케이스. 탱크(mkbound=0)는 고정(fixed) 상태 유지.
+  기하 형상: 반지름 0.06m, 높이 0.18m, 물 0.09m 높이 (new_robot의 water_tank.stl과 동일 치수)
+
+  가속도 프로파일: new_robot_accel.csv (972개 시점, 총 48.55초,
+  gazebo odometry로부터 process_odometry.py + convert_to_accinput.py로 생성)
+
+  new_robot_accel.csv를 GenCase/DualSPHysics 실행 폴더(같은 디렉토리)에
+  같이 둬야 합니다.
+
+  실행:
+    cd ~/slosh_ws/dualsphysics/DualSPHysics/bin/linux
+    ./GenCase_linux64 NewRobotTank_Motion_Def NewRobotTankMotion_out/NewRobotTankMotion -save:all
+-->
+<case app="GenCase" date="">
+  <casedef>
+    <constantsdef>
+      <lattice bound="1" fluid="1" />
+      <gravity x="0" y="0" z="-9.81" comment="중력 가속도" units_comment="m/s^2" />
+      <rhop0 value="1000" comment="물 기준 밀도" units_comment="kg/m^3" />
+      <hswl value="0" auto="true" comment="최대 정지수위 (자동계산)" />
+      <gamma value="7" comment="상태방정식 다형지수" />
+      <speedsystem value="0" auto="true" />
+      <coefsound value="20" />
+      <speedsound value="0" auto="true" />
+      <coefh value="1.0" comment="스무딩 길이 계수" />
+      <cflnumber value="0.2" />
+    </constantsdef>
+
+    <mkconfig boundcount="240" fluidcount="10" />
+
+    <geometry>
+      <definition dp="0.003">
+        <pointmin x="-0.09" y="-0.09" z="-0.02" />
+        <pointmax x="0.09" y="0.09" z="0.23" />
+      </definition>
+
+      <commands>
+        <mainlist>
+
+          <!-- ===== 탱크 바닥 (경계, boundary) ===== -->
+          <setmkbound mk="0" />
+          <setdrawmode mode="full" />
+          <drawcylinder radius="0.06" objname="TankFloor">
+            <point x="0" y="0" z="-0.01" />
+            <point x="0" y="0" z="0" />
+          </drawcylinder>
+
+          <!-- ===== 탱크 옆벽 (경계, boundary, 속이 빈 원통, 윗뚜껑 없음) ===== -->
+          <setmkbound mk="0" />
+          <setdrawmode mode="face" />
+          <drawcylinder radius="0.06" objname="TankWall">
+            <point x="0" y="0" z="0" />
+            <point x="0" y="0" z="0.18" />
+          </drawcylinder>
+
+          <!-- ===== 물 (fluid), 바닥 위 0.09m 높이까지 채움 (탱크 절반) ===== -->
+          <setmkfluid mk="0" />
+          <setdrawmode mode="full" />
+          <drawcylinder radius="0.057" objname="Water">
+            <point x="0" y="0" z="0.002" />
+            <point x="0" y="0" z="0.09" />
+          </drawcylinder>
+
+          <shapeout file="" />
+        </mainlist>
+      </commands>
+    </geometry>
+
+    <!-- 탱크는 고정(fixed) 유지. 차량 가속도는 물리적으로 탱크를 이동시키는
+         대신 아래 execution/special/accinputs에서 물 입자에 직접
+         관성 가속도를 주입하는 방식으로 구현합니다. -->
+
+  </casedef>
+
+  <execution>
+    <special>
+      <!-- ===== new_robot 실제 주행 가속도 프로파일 주입 ===== -->
+      <accinputs>
+        <accinput mkfluid="0">
+          <acccentre x="0" y="0" z="0" comment="가속도 기준점" units_comment="metres (m)" />
+          <globalgravity value="1" comment="1: 중력 유지, CSV 값은 추가 관성력만 담당" />
+          <acctimesfile value="new_robot_accel.csv" comment="new_robot 주행 가속도 프로파일 (7컬럼: time,linx,liny,linz,angx,angy,angz)" />
+        </accinput>
+      </accinputs>
+    </special>
+    <parameters>
+      <parameter key="SavePosDouble" value="0" comment="입자 위치를 double로 저장할지 여부" />
+      <parameter key="Boundary" value="1" comment="1:DBC 경계조건" />
+      <parameter key="StepAlgorithm" value="2" comment="1:Verlet 2:Symplectic" />
+      <parameter key="Kernel" value="2" comment="1:Cubic 2:Wendland" />
+      <parameter key="ViscoTreatment" value="1" comment="1:인공점성 2:층류+SPS" />
+      <parameter key="Visco" value="0.01" comment="점성 계수" />
+      <parameter key="DensityDT" value="2" comment="밀도 확산 보정" />
+      <parameter key="DensityDTvalue" value="0.1" />
+      <parameter key="Shifting" value="0" comment="0:없음 1:무경계 2:전체 3:자유표면 제외" />
+      <parameter key="RigidAlgorithm" value="1" comment="강체 알고리즘" />
+      <parameter key="FtPause" value="0" />
+      <parameter key="CoefDtMin" value="0.05" />
+      <parameter key="TimeMax" value="48.55" comment="총 시뮬레이션 시간(초), new_robot_accel.csv 전체 길이와 일치" />
+      <parameter key="TimeOut" value="0.05" comment="결과 저장 간격(초)" />
+      <parameter key="IncZ" value="0" />
+    </parameters>
+  </execution>
+</case>
