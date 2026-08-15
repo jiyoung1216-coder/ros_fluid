@@ -96,6 +96,12 @@ def generate_launch_description():
         arguments=['/gimbal_pitch_cmd@std_msgs/msg/Float64]gz.msgs.Double'],
         output='screen',
     )
+    imu_tray_bridge = Node(
+        package='ros_gz_bridge',
+        executable='parameter_bridge',
+        arguments=['/imu_tray@sensor_msgs/msg/Imu[gz.msgs.IMU'],
+        output='screen',
+    )
 
     return LaunchDescription([
         set_resource_path,
@@ -108,5 +114,6 @@ def generate_launch_description():
         gimbal_roll_bridge,
         gimbal_pitch_bridge,
         imu_bridge,
+        imu_tray_bridge,
 
     ])

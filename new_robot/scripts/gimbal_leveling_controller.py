@@ -1,28 +1,133 @@
 #!/usr/bin/env python3
-import math #삼각함수(atan2, asin) 쓰려고
+"""
+gimbal_leveling_controller.py
+
+pid_control_parkver/Control.cpp (ESP32 펌웨어)의 제어 알고리즘을
+ROS2(rclpy) + Gazebo Harmonic(gz sim) 시뮬레이션용으로 이식한 노드.
+
+원본과의 차이점 (가제보_연동_확인사항_답변.md 기준):
+  - 액추에이터가 이미 위치 컨트롤러(gz-sim-joint-position-controller-system,
+    내부 PID p=25 i=0 d=1.5)이므로, 여기서는 "목표 각도(rad)"만 계산해서
+    /gimbal_roll_cmd, /gimbal_pitch_cmd 로 보낸다.
+  - 원본 Phase 4(모터 피드백 기반 게인 스케줄링 PID)는 그대로 옮기지 않고,
+    tray IMU가 있을 때만 활성화되는 "보정 trim"으로 역할을 바꿨다.
+  - orientation 쿼터니언의 "노드 시작 시점 값을 0으로 잡고 상대 회전만 사용"
+    보정은 팀 쪽 기존 프로토타입 방식을 그대로 따라했다.
+  - ▶ 추가: 실시간 물 출렁임(Housner) 추정 보정 레이어. tray IMU가 겪는
+    초과가속도(baseline 대비 차이)를 스프링-질량-댐퍼 방정식(1차 슬로싱
+    모드)에 실시간으로 흘려서 예상 출렁임을 추정하고, 그만큼을 목표각에
+    더해준다. tray IMU가 없으면 항상 0이라 원본과 동일하게 동작한다.
+  - ▶ 수정: 원본 Control.cpp는 roll만 관성보상/데드존을 건너뛰고
+    -roll_filtered를 그대로 ZV에 넣는 비대칭 구조였는데, 정지 상태에서도
+    roll이 과민반응(촐랑거림)하는 원인이라 pitch와 동일하게 스무딩+데드존을
+    거치도록 대칭으로 고쳤다.
+  - ▶ 추가: 최종 출력(roll_cmd, pitch_cmd)에 저역통과 필터(OUTPUT_SMOOTH)를
+    한 번 더 씌워서, 어떤 레이어에서 온 노이즈든 급격한 반응 없이 부드럽게
+    나가도록 했다.
+
+⚠️ 반드시 시뮬레이션에서 직접 확인/조정해야 하는 부분
+  - "축 부호 설정" 블록의 부호(+-1).
+  - KP_MIN_DEG / KP_MAX_DEG: tray IMU 추가 후 재튜닝 필요.
+  - K_SLOSH: 물 출렁임 보정 게인. 부호(+-)와 크기 모두 튜닝 필요.
+  - OUTPUT_SMOOTH: 낮출수록 부드럽지만 반응이 느려짐. 0.15부터 시작해서 조정.
+"""
+
+import math
 
 import rclpy
-from rclpy.node import Node # ROS2 파이썬 노드를 만들기 위한 기본 라이브러리
-from sensor_msgs.msg import Imu #/imu 토픽에서 오는 메시지 타입 (orientation, angular_velocity, linear_acceleration 등이 들어있는 그 구조체)
-from std_msgs.msg import Float64 #/gimbal_roll_cmd, /gimbal_pitch_cmd로 내보낼 때 쓰는 단순 숫자 하나짜리 메시지 타입
+from rclpy.node import Node
+from sensor_msgs.msg import Imu
+from std_msgs.msg import Float64
+
+# ---------------------------------------------------------------------------
+# 상수 (Config.h / Control.cpp 원본값 이식)
+# ---------------------------------------------------------------------------
+G = 9.80665  # m/s^2
+
+ALPHA_BASE = 0.98
+ALPHA_TRAY = 0.995
+DT = 0.01  # 100Hz 제어 주기
+
+ZV_BUFFER_SIZE = 40
+DELTA_IDX = 21
+DELTA_IDX_SMALL = 11
+
+DEADZONE_PITCH_DEG = 2.0
+DEADZONE_ROLL_DEG = 3.0
+
+PITCH_SMOOTH_NEW = 0.3
+ROLL_SMOOTH_NEW = 0.1
+
+KP_MIN_DEG = 0.05
+KP_MAX_DEG = 0.30
+ERROR_MAX_DEG = 15.0
+
+JOINT_LIMIT_RAD = 0.4363  # ±25°
+
+OUTPUT_SMOOTH = 0.15  # 최종 출력 저역통과 필터. 0에 가까울수록 부드럽고 느림
+
+# ---------------------------------------------------------------------------
+# 축 부호 설정 — 시뮬레이션에서 실제로 기울여보고 검증/조정할 것
+# ---------------------------------------------------------------------------
+GYRO_ROLL_SIGN = 1.0
+GYRO_PITCH_SIGN = 1.0
+ACC_ROLL_SIGN = 1.0
+ACC_PITCH_SIGN = 1.0
+
+BASE_IMU_TOPIC = "/imu"
+TRAY_IMU_TOPIC = "/imu_tray"
+ROLL_CMD_TOPIC = "/gimbal_roll_cmd"
+PITCH_CMD_TOPIC = "/gimbal_pitch_cmd"
+
+# ---------------------------------------------------------------------------
+# 물 출렁임(Housner) 실시간 추정 관련 상수 — 원본 Control.cpp에는 없음, 추가 레이어
+# ---------------------------------------------------------------------------
+TANK_RADIUS = 0.06
+FILL_HEIGHT = 0.09
+SLOSH_DAMPING_RATIO = 0.01
+K_SLOSH = 1.0
+LAMBDA1 = 1.8412
 
 
-def quat_to_roll_pitch(x, y, z, w): #쿼터니언(4개 숫자로 3D 회전을 표현하는 방식)을 사람이 이해하기 쉬운 Roll(좌우 기울기), Pitch(앞뒤 기울기) 각도로 변환하는 표준 공식이에요.
-    sinr_cosp = 2 * (w * x + y * z)
-    cosr_cosp = 1 - 2 * (x * x + y * y)
-    roll = math.atan2(sinr_cosp, cosr_cosp) #쿼터니언(4개 숫자로 3D 회전을 표현하는 방식)을 사람이 이해하기 쉬운 Roll(좌우 기울기), Pitch(앞뒤 기울기) 각도로 변환하는 표준 공식이에요.
+def sloshing_parameters(radius=TANK_RADIUS, fill_height=FILL_HEIGHT):
+    R, h = radius, fill_height
+    omega1 = math.sqrt((LAMBDA1 * G / R) * math.tanh(LAMBDA1 * h / R))
+    x = LAMBDA1 * h / R
+    h1_over_h = 1 - (math.cosh(x) - 1) / (x * math.sinh(x))
+    h1 = h1_over_h * h
+    return omega1, h1
 
-    sinp = max(-1.0, min(1.0, 2 * (w * y - z * x)))
-    pitch = math.asin(sinp)
-    return roll, pitch #Pitch 계산 공식. max(-1.0, min(1.0, ...))로 값을 -1~1 사이로 강제로 잘라주는(clamp) 이유는, 부동소수점 계산 오차로 asin에 1.0000001 같은 값이 들어가면 에러(NaN)가 나기 때문에 안전장치로 넣은 거예요.
+
+class SloshEstimator1D:
+    """단일 축 방향 Housner 등가 진자 실시간 추정기 (RK4, 매 틱 1스텝)."""
+
+    def __init__(self, omega1, h1, damping_ratio=SLOSH_DAMPING_RATIO):
+        self.omega1 = omega1
+        self.h1 = h1
+        self.c1 = 2 * damping_ratio * omega1
+        self.xi = 0.0
+        self.xi_dot = 0.0
+
+    def _deriv(self, xi, xi_dot, a_forcing):
+        return xi_dot, -self.omega1 ** 2 * xi - self.c1 * xi_dot - a_forcing
+
+    def update(self, a_forcing, dt=DT):
+        x0, v0 = self.xi, self.xi_dot
+        k1x, k1v = self._deriv(x0, v0, a_forcing)
+        k2x, k2v = self._deriv(x0 + 0.5 * dt * k1x, v0 + 0.5 * dt * k1v, a_forcing)
+        k3x, k3v = self._deriv(x0 + 0.5 * dt * k2x, v0 + 0.5 * dt * k2v, a_forcing)
+        k4x, k4v = self._deriv(x0 + dt * k3x, v0 + dt * k3v, a_forcing)
+        self.xi = x0 + (dt / 6.0) * (k1x + 2 * k2x + 2 * k3x + k4x)
+        self.xi_dot = v0 + (dt / 6.0) * (k1v + 2 * k2v + 2 * k3v + k4v)
+        return self.xi / self.h1  # 등가 보정각 (rad)
 
 
-def quat_conjugate(q): #Pitch 계산 공식. max(-1.0, min(1.0, ...))로 값을 -1~1 사이로 강제로 잘라주는(clamp) 이유는, 부동소수점 계산 오차로 asin에 1.0000001 같은 값이 들어가면 에러(NaN)가 나기 때문에 안전장치로 넣은 거예요.
+def quat_conjugate(q):
     x, y, z, w = q
     return (-x, -y, -z, w)
 
 
-def quat_multiply(q1, q2): #두 회전을 "합성"하는 공식이에요 (일반 숫자 곱셈이 아니라 쿼터니언 전용 곱셈 공식). q1 * q2는 "q2만큼 회전한 다음, q1만큼 더 회전"한 결과예요.
+def quat_multiply(q1, q2):
     x1, y1, z1, w1 = q1
     x2, y2, z2, w2 = q2
     return (
@@ -33,46 +138,215 @@ def quat_multiply(q1, q2): #두 회전을 "합성"하는 공식이에요 (일반
     )
 
 
-class GimbalLevelingController(Node): #ROS2 노드 이름을 gimbal_leveling_controller로 등록
+def quat_to_roll_pitch_deg(q):
+    """REP-103 기준 roll(X축 회전)/pitch(Y축 회전)을 degree로 반환."""
+    x, y, z, w = q
+    sinr_cosp = 2.0 * (w * x + y * z)
+    cosr_cosp = 1.0 - 2.0 * (x * x + y * y)
+    roll = math.atan2(sinr_cosp, cosr_cosp)
+
+    sinp = 2.0 * (w * y - z * x)
+    sinp = max(-1.0, min(1.0, sinp))
+    pitch = math.asin(sinp)
+
+    return math.degrees(roll), math.degrees(pitch)
+
+
+class ConvolvedZV:
+    """Control.cpp의 applyConvolvedZV() 그대로 이식 (4-tap, 가중치 0.25씩)."""
+
     def __init__(self):
-        super().__init__('gimbal_leveling_controller')
-        self.declare_parameter('kp', 1.0)
-        self.kp = self.get_parameter('kp').value
-        self.q0 = None  # 시작 시점의 IMU 자세를 "수평 기준"으로 저장
+        self.buffer = [0.0] * ZV_BUFFER_SIZE
+        self.head = 0
 
-        self.roll_pub = self.create_publisher(Float64, '/gimbal_roll_cmd', 10)
-        self.pitch_pub = self.create_publisher(Float64, '/gimbal_pitch_cmd', 10)
-        self.create_subscription(Imu, '/imu', self.imu_callback, 10)
-        self.get_logger().info(f'gimbal_leveling_controller started, kp={self.kp}')
+    def apply(self, target: float) -> float:
+        buf = self.buffer
+        idx0 = self.head
+        idx1 = (self.head - DELTA_IDX) % ZV_BUFFER_SIZE
+        idx2 = (self.head - DELTA_IDX_SMALL) % ZV_BUFFER_SIZE
+        idx3 = (self.head - (DELTA_IDX + DELTA_IDX_SMALL)) % ZV_BUFFER_SIZE
 
-    def imu_callback(self, msg: Imu):
-        q = (msg.orientation.x, msg.orientation.y, msg.orientation.z, msg.orientation.w)
+        buf[self.head] = target
+        shaped = 0.25 * buf[idx0] + 0.25 * buf[idx1] + 0.25 * buf[idx2] + 0.25 * buf[idx3]
+        self.head = (self.head + 1) % ZV_BUFFER_SIZE
+        return shaped
 
-        if self.q0 is None:
-            self.q0 = q
-            self.get_logger().info('IMU baseline captured (assumes robot is level right now)')
+
+class GimbalLevelingController(Node):
+    def __init__(self):
+        super().__init__("gimbal_leveling_controller")
+
+        self.base_sub = self.create_subscription(Imu, BASE_IMU_TOPIC, self._on_base_imu, 50)
+        self.tray_sub = self.create_subscription(Imu, TRAY_IMU_TOPIC, self._on_tray_imu, 50)
+
+        self.roll_pub = self.create_publisher(Float64, ROLL_CMD_TOPIC, 10)
+        self.pitch_pub = self.create_publisher(Float64, PITCH_CMD_TOPIC, 10)
+
+        self._latest_base = None
+        self._latest_tray = None
+        self._base_baseline_q = None
+        self._tray_baseline_q = None
+        self._tray_seen = False
+
+        # Phase 1 상태
+        self.pitch_filtered = 0.0
+        self.roll_filtered = 0.0
+        self.tray_pitch_filtered = 0.0
+        self.tray_roll_filtered = 0.0
+
+        # Phase 2 상태
+        self.internal_pitch = 0.0
+        self.internal_roll = 0.0
+
+        self.zv_pitch = ConvolvedZV()
+        self.zv_roll = ConvolvedZV()
+
+        # 출력단 저역통과 필터 상태
+        self.roll_cmd_filtered = 0.0
+        self.pitch_cmd_filtered = 0.0
+
+        # 물 출렁임 실시간 추정
+        self._tray_accel0 = None
+        self._tray_excess = (0.0, 0.0, 0.0)
+        omega1, h1 = sloshing_parameters()
+        self.get_logger().info(f"Housner: omega1={omega1:.3f} rad/s, h1={h1:.4f} m")
+        self.slosh_roll = SloshEstimator1D(omega1, h1)
+        self.slosh_pitch = SloshEstimator1D(omega1, h1)
+
+        self.timer = self.create_timer(DT, self.run_control_step)
+        self.get_logger().info(
+            "gimbal_leveling_controller 시작 (base IMU만 사용, tray IMU 대기 중)"
+        )
+
+    # -- 콜백 ----------------------------------------------------------------
+    def _on_base_imu(self, msg: Imu):
+        self._latest_base = msg
+        if self._base_baseline_q is None:
+            q = (msg.orientation.x, msg.orientation.y, msg.orientation.z, msg.orientation.w)
+            self._base_baseline_q = quat_conjugate(q)
+
+    def _on_tray_imu(self, msg: Imu):
+        self._latest_tray = msg
+        if self._tray_baseline_q is None:
+            q = (msg.orientation.x, msg.orientation.y, msg.orientation.z, msg.orientation.w)
+            self._tray_baseline_q = quat_conjugate(q)
+        if not self._tray_seen:
+            self._tray_seen = True
+            self.get_logger().info("tray IMU 감지됨 — 이후부터 보정 trim + 슬로싱 추정 활성화")
+
+        a = (msg.linear_acceleration.x, msg.linear_acceleration.y, msg.linear_acceleration.z)
+        if self._tray_accel0 is None:
+            self._tray_accel0 = a
+            return
+        self._tray_excess = tuple(a[i] - self._tray_accel0[i] for i in range(3))
+
+    # -- 메인 루프 -------------------------------------------------------------
+    def run_control_step(self):
+        if self._latest_base is None:
             return
 
-        # 시작 시점 대비 "상대 회전"만 추출
-        q_rel = quat_multiply(quat_conjugate(self.q0), q)
-        roll, pitch = quat_to_roll_pitch(*q_rel)
+        base = self._latest_base
+        base_q_rel = quat_multiply(self._base_baseline_q,
+                                    (base.orientation.x, base.orientation.y,
+                                     base.orientation.z, base.orientation.w))
+        roll_acc, pitch_acc = quat_to_roll_pitch_deg(base_q_rel)
+        roll_acc *= ACC_ROLL_SIGN
+        pitch_acc *= ACC_PITCH_SIGN
 
-        roll_cmd = max(-0.4363, min(0.4363, -self.kp * roll))
-        pitch_cmd = max(-0.4363, min(0.4363, -self.kp * pitch))
+        rate_roll = math.degrees(base.angular_velocity.x) * GYRO_ROLL_SIGN
+        rate_pitch = math.degrees(base.angular_velocity.y) * GYRO_PITCH_SIGN
 
-        self.get_logger().info(f'roll={roll:.4f} pitch={pitch:.4f}')
+        # Phase 1: 하단 상보필터
+        self.pitch_filtered = ALPHA_BASE * (self.pitch_filtered + rate_pitch * DT) \
+            + (1.0 - ALPHA_BASE) * pitch_acc
+        self.roll_filtered = ALPHA_BASE * (self.roll_filtered + rate_roll * DT) \
+            + (1.0 - ALPHA_BASE) * roll_acc
 
-        self.roll_pub.publish(Float64(data=roll_cmd))
-        self.pitch_pub.publish(Float64(data=pitch_cmd))
+        # Phase 2: 관성 보상 목표각 + ZV
+        ax = base.linear_acceleration.x * ACC_ROLL_SIGN
+        ay = base.linear_acceleration.y * ACC_PITCH_SIGN
+        a_linear_y = ay - G * math.sin(math.radians(self.pitch_filtered))
+        a_linear_x = ax - G * math.sin(math.radians(self.roll_filtered))
+        raw_target_pitch = math.degrees(math.atan2(a_linear_y, G))
+        raw_target_roll = math.degrees(math.atan2(a_linear_x, G))
+
+        self.internal_pitch = PITCH_SMOOTH_NEW * raw_target_pitch \
+            + (1.0 - PITCH_SMOOTH_NEW) * self.internal_pitch
+        self.internal_roll = ROLL_SMOOTH_NEW * raw_target_roll \
+            + (1.0 - ROLL_SMOOTH_NEW) * self.internal_roll
+
+        final_target_pitch = self.internal_pitch
+        if abs(final_target_pitch) < DEADZONE_PITCH_DEG:
+            final_target_pitch = 0.0
+
+        # roll도 pitch와 동일하게 스무딩+데드존을 거치도록 대칭으로 수정
+        # (원본 Control.cpp는 -roll_filtered를 그대로 ZV에 넣는 비대칭
+        # 구조였는데, 정지 상태에서도 roll이 과민반응하는 원인이었다)
+        final_target_roll = self.internal_roll
+        if abs(final_target_roll) < DEADZONE_ROLL_DEG:
+            final_target_roll = 0.0
+
+        shaped_pitch = self.zv_pitch.apply(final_target_pitch)
+        shaped_roll = self.zv_roll.apply(final_target_roll)
+
+        target_pitch_deg = shaped_pitch
+        target_roll_deg = shaped_roll
+
+        # Phase 3+4: tray IMU 기반 보정 trim
+        if self._tray_seen and self._latest_tray is not None:
+            tray = self._latest_tray
+            tray_q_rel = quat_multiply(self._tray_baseline_q,
+                                        (tray.orientation.x, tray.orientation.y,
+                                         tray.orientation.z, tray.orientation.w))
+            tray_roll_acc, tray_pitch_acc = quat_to_roll_pitch_deg(tray_q_rel)
+
+            tray_rate_roll = math.degrees(tray.angular_velocity.x) * GYRO_ROLL_SIGN
+            tray_rate_pitch = math.degrees(tray.angular_velocity.y) * GYRO_PITCH_SIGN
+
+            self.tray_pitch_filtered = ALPHA_TRAY * (self.tray_pitch_filtered + tray_rate_pitch * DT) \
+                + (1.0 - ALPHA_TRAY) * tray_pitch_acc
+            self.tray_roll_filtered = ALPHA_TRAY * (self.tray_roll_filtered + tray_rate_roll * DT) \
+                + (1.0 - ALPHA_TRAY) * tray_roll_acc
+
+            error_roll = shaped_roll - self.tray_roll_filtered
+            ratio = max(0.0, min(1.0, abs(error_roll) / ERROR_MAX_DEG))
+            kp_dyn = KP_MIN_DEG + (KP_MAX_DEG - KP_MIN_DEG) * ratio * ratio
+            target_roll_deg = shaped_roll + kp_dyn * error_roll
+
+            error_pitch = shaped_pitch - self.tray_pitch_filtered
+            target_pitch_deg = shaped_pitch + kp_dyn * error_pitch
+
+        # 추가 레이어: 실시간 물 출렁임(Housner) 추정 보정
+        ex, ey, _ez = self._tray_excess
+        roll_slosh_corr_rad = self.slosh_roll.update(ey)
+        pitch_slosh_corr_rad = self.slosh_pitch.update(ex)
+        target_roll_deg += K_SLOSH * math.degrees(roll_slosh_corr_rad)
+        target_pitch_deg += K_SLOSH * math.degrees(pitch_slosh_corr_rad)
+
+        # 최종 출력: degree -> radian, 조인트 리밋 클램프 후 출력단 저역통과 필터
+        roll_cmd_raw = max(-JOINT_LIMIT_RAD, min(JOINT_LIMIT_RAD, math.radians(target_roll_deg)))
+        pitch_cmd_raw = max(-JOINT_LIMIT_RAD, min(JOINT_LIMIT_RAD, math.radians(target_pitch_deg)))
+
+        self.roll_cmd_filtered = OUTPUT_SMOOTH * roll_cmd_raw \
+            + (1.0 - OUTPUT_SMOOTH) * self.roll_cmd_filtered
+        self.pitch_cmd_filtered = OUTPUT_SMOOTH * pitch_cmd_raw \
+            + (1.0 - OUTPUT_SMOOTH) * self.pitch_cmd_filtered
+
+        self.roll_pub.publish(Float64(data=self.roll_cmd_filtered))
+        self.pitch_pub.publish(Float64(data=self.pitch_cmd_filtered))
 
 
-def main():
-    rclpy.init()
+def main(args=None):
+    rclpy.init(args=args)
     node = GimbalLevelingController()
-    rclpy.spin(node)
-    node.destroy_node()
-    rclpy.shutdown()
+    try:
+        rclpy.spin(node)
+    except KeyboardInterrupt:
+        pass
+    finally:
+        node.destroy_node()
+        rclpy.shutdown()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
