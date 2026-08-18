@@ -49,7 +49,7 @@ def generate_launch_description():
         arguments=[
             '-topic', 'robot_description',
             '-name', 'new_robot',
-            '-x', '0', '-y', '0', '-z', '0.5',
+            '-x', '0', '-y', '0', '-z', '0.15',
             '-R', '-1.57079632679',
             '-P', '1.57079632679',
             '-Y', '0',
@@ -102,6 +102,12 @@ def generate_launch_description():
         arguments=['/imu_tray@sensor_msgs/msg/Imu[gz.msgs.IMU'],
         output='screen',
     )
+    tray_pose_bridge = Node(
+        package='ros_gz_bridge',
+        executable='parameter_bridge',
+        arguments=['/model/new_robot/pose@tf2_msgs/msg/TFMessage[gz.msgs.Pose_V'],
+        output='screen',
+    )
 
     return LaunchDescription([
         set_resource_path,
@@ -115,5 +121,6 @@ def generate_launch_description():
         gimbal_pitch_bridge,
         imu_bridge,
         imu_tray_bridge,
+        tray_pose_bridge,
 
     ])

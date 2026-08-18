@@ -24,18 +24,35 @@ ROS2(rclpy) + Gazebo Harmonic(gz sim) 시뮬레이션용으로 이식한 노드.
   - ▶ 추가: 최종 출력(roll_cmd, pitch_cmd)에 저역통과 필터(OUTPUT_SMOOTH)를
     한 번 더 씌워서, 어떤 레이어에서 온 노이즈든 급격한 반응 없이 부드럽게
     나가도록 했다.
+  - ▶ 추가: 활성/대기 게이트(ActivityGate). 정지 상태에서도 슬로싱
+    추정기(SloshEstimator1D)가 감쇠비 1%짜리 거의 무감쇠 공진기라서,
+    트레이 IMU의 순수 센서 노이즈만으로도 계속 링잉하며 짐벌을 흔드는
+    문제가 있었다. cmd_vel(주행 명령) + 실측 자이로/가속도 크기를
+    히스테리시스로 판정해서, 정지 상태(gate≈0)에서는 슬로싱 추정 레이어를
+    완전히 끄고(추정기 내부 상태도 0으로 리셋) 실제 주행/외란이 감지될
+    때만 부드러운 램프로 게인을 올려 활성화한다.
+  - ▶ 수정: Phase 2 데드존을 하드 컷(임계값 이하는 즉시 0으로 점프)에서
+    연속적인 데드밴드(임계값만큼 빼는 방식)로 바꿨다. 하드 컷은 값이
+    임계값 근처에서 흔들릴 때 0으로 순간 점프하는 불연속을 만들고, 이게
+    ZV 셰이퍼에 계단 입력을 넣는 것과 같은 효과를 내서 정지 상태에서도
+    미세한 촐랑거림의 원인이 됐었다.
 
 ⚠️ 반드시 시뮬레이션에서 직접 확인/조정해야 하는 부분
   - "축 부호 설정" 블록의 부호(+-1).
   - KP_MIN_DEG / KP_MAX_DEG: tray IMU 추가 후 재튜닝 필요.
   - K_SLOSH: 물 출렁임 보정 게인. 부호(+-)와 크기 모두 튜닝 필요.
   - OUTPUT_SMOOTH: 낮출수록 부드럽지만 반응이 느려짐. 0.15부터 시작해서 조정.
+  - ACTIVE_ENTER_*/ACTIVE_EXIT_*: 활성/대기 게이트 진입·이탈 임계값.
+    실제 로봇 정지 시 센서 노이즈 크기, 주행 시 최소 속도값에 맞춰 조정.
+  - SLOSH_DAMPING_RATIO(0.2로 상향)/SLOSH_FORCING_DEADBAND: 슬로싱
+    추정기가 노이즈에 링잉하지 않도록 하는 값. 튜닝 필요.
 """
 
 import math
 
 import rclpy
 from rclpy.node import Node
+from geometry_msgs.msg import Twist
 from sensor_msgs.msg import Imu
 from std_msgs.msg import Float64
 
@@ -64,7 +81,7 @@ ERROR_MAX_DEG = 15.0
 
 JOINT_LIMIT_RAD = 0.4363  # ±25°
 
-OUTPUT_SMOOTH = 0.15  # 최종 출력 저역통과 필터. 0에 가까울수록 부드럽고 느림
+OUTPUT_SMOOTH = 0.08  # 최종 출력 저역통과 필터. 0에 가까울수록 부드럽고 느림
 
 # ---------------------------------------------------------------------------
 # 축 부호 설정 — 시뮬레이션에서 실제로 기울여보고 검증/조정할 것
@@ -78,15 +95,47 @@ BASE_IMU_TOPIC = "/imu"
 TRAY_IMU_TOPIC = "/imu_tray"
 ROLL_CMD_TOPIC = "/gimbal_roll_cmd"
 PITCH_CMD_TOPIC = "/gimbal_pitch_cmd"
+CMD_VEL_TOPIC = "/cmd_vel"
 
 # ---------------------------------------------------------------------------
 # 물 출렁임(Housner) 실시간 추정 관련 상수 — 원본 Control.cpp에는 없음, 추가 레이어
 # ---------------------------------------------------------------------------
 TANK_RADIUS = 0.06
 FILL_HEIGHT = 0.09
-SLOSH_DAMPING_RATIO = 0.01
-K_SLOSH = 1.0
+# 정지 상태에서 순수 센서 노이즈로도 거의 감쇠 없이 계속 링잉하던 게
+# 정지 시 짐벌 촐랑거림의 주 원인이었다. 물리적으로 정확한 값(원래 0.01)
+# 대신, 보정 신호가 빨리 잦아들도록 의도적으로 높인 "제어용" 감쇠비.
+SLOSH_DAMPING_RATIO = 0.2
+# 이 이하의 초과가속도(센서 노이즈 수준)는 추정기에 아예 입력하지 않는다.
+SLOSH_FORCING_DEADBAND = 0.10  # m/s^2
+K_SLOSH = 0.3
 LAMBDA1 = 1.8412
+
+# ---------------------------------------------------------------------------
+# 활성/대기 게이트 — 정지 상태에서는 슬로싱 추정(반응형 보정)을 억제하고,
+# 실제 주행 명령(cmd_vel)이나 측정 외란(자이로/가속도)이 감지될 때만
+# 활성화한다. 진입/이탈 임계값을 다르게 둬서(히스테리시스) 임계값 부근에서
+# 게이트가 자주 껐다 켜졌다 하는 채터링을 막고, 게인 자체도 지수 램프로
+# 부드럽게 움직인다.
+# ---------------------------------------------------------------------------
+ACTIVE_ENTER_CMDVEL_LIN = 0.03  # m/s
+ACTIVE_ENTER_CMDVEL_ANG = 0.05  # rad/s
+ACTIVE_EXIT_CMDVEL_LIN = 0.01
+ACTIVE_EXIT_CMDVEL_ANG = 0.02
+
+ACTIVE_ENTER_GYRO_DEG = 3.0  # deg/s, base 자이로 rate 크기
+ACTIVE_EXIT_GYRO_DEG = 1.0
+
+ACTIVE_ENTER_ACC = 0.25  # m/s^2, base 가속도(x,y) 크기
+ACTIVE_EXIT_ACC = 0.10
+
+GATE_ATTACK_TAU = 0.15  # s — 외란 감지 시 빠르게 활성화
+GATE_RELEASE_TAU = 0.6  # s — 정지로 판단되면 완만하게 대기 상태로 복귀
+
+# 노드 시작 직후 로봇이 스폰 낙하/착지 충격으로 흔들리는 동안 IMU 값을
+# baseline(기준 자세)으로 잘못 고정해버리는 걸 막기 위한 정착 대기 시간.
+# 이 시간 동안은 baseline을 잡지 않고 대기만 한다.
+SETTLE_TIME_SEC = 2.0
 
 
 def sloshing_parameters(radius=TANK_RADIUS, fill_height=FILL_HEIGHT):
@@ -120,6 +169,21 @@ class SloshEstimator1D:
         self.xi = x0 + (dt / 6.0) * (k1x + 2 * k2x + 2 * k3x + k4x)
         self.xi_dot = v0 + (dt / 6.0) * (k1v + 2 * k2v + 2 * k3v + k4v)
         return self.xi / self.h1  # 등가 보정각 (rad)
+
+
+def apply_deadband(value: float, threshold: float) -> float:
+    """threshold 이하는 0, 그 이상은 끊김 없이 통과시키는 연속 데드밴드.
+
+    (기존의 하드 컷 `abs(x) < threshold -> 0`은 x가 threshold 근처에서
+    흔들릴 때 0으로 순간 점프하는 불연속을 만든다. 그 불연속이 ZV
+    셰이퍼에 계단 입력을 넣는 것과 같은 효과를 내서 정지 상태에서도
+    미세한 촐랑거림을 유발했다.)
+    """
+    if value > threshold:
+        return value - threshold
+    if value < -threshold:
+        return value + threshold
+    return 0.0
 
 
 def quat_conjugate(q):
@@ -172,12 +236,50 @@ class ConvolvedZV:
         return shaped
 
 
+class ActivityGate:
+    """cmd_vel + 측정 IMU 기반 히스테리시스 활성/대기 게이트.
+
+    정지 상태(cmd_vel과 실측 자이로/가속도가 모두 이탈 임계값 이하)에서는
+    게인이 0으로 수렴해 슬로싱 추정 보정을 끄고, 주행 명령이나 실제
+    외란이 진입 임계값을 넘으면 게인이 빠르게(GATE_ATTACK_TAU) 1로 올라가
+    보정을 켠다. 다시 조용해지면 GATE_RELEASE_TAU로 천천히 대기 상태로
+    복귀한다.
+    """
+
+    def __init__(self):
+        self.active = False
+        self.gain = 0.0
+
+    def update(self, cmd_lin: float, cmd_ang: float, gyro_deg: float,
+               acc_mag: float, dt: float) -> float:
+        enter = (abs(cmd_lin) > ACTIVE_ENTER_CMDVEL_LIN
+                 or abs(cmd_ang) > ACTIVE_ENTER_CMDVEL_ANG
+                 or gyro_deg > ACTIVE_ENTER_GYRO_DEG
+                 or acc_mag > ACTIVE_ENTER_ACC)
+        stay_idle = (abs(cmd_lin) < ACTIVE_EXIT_CMDVEL_LIN
+                     and abs(cmd_ang) < ACTIVE_EXIT_CMDVEL_ANG
+                     and gyro_deg < ACTIVE_EXIT_GYRO_DEG
+                     and acc_mag < ACTIVE_EXIT_ACC)
+
+        if not self.active and enter:
+            self.active = True
+        elif self.active and stay_idle:
+            self.active = False
+
+        target = 1.0 if self.active else 0.0
+        tau = GATE_ATTACK_TAU if target > self.gain else GATE_RELEASE_TAU
+        alpha = dt / (tau + dt)
+        self.gain += alpha * (target - self.gain)
+        return self.gain
+
+
 class GimbalLevelingController(Node):
     def __init__(self):
         super().__init__("gimbal_leveling_controller")
 
         self.base_sub = self.create_subscription(Imu, BASE_IMU_TOPIC, self._on_base_imu, 50)
         self.tray_sub = self.create_subscription(Imu, TRAY_IMU_TOPIC, self._on_tray_imu, 50)
+        self.cmd_sub = self.create_subscription(Twist, CMD_VEL_TOPIC, self._on_cmd_vel, 10)
 
         self.roll_pub = self.create_publisher(Float64, ROLL_CMD_TOPIC, 10)
         self.pitch_pub = self.create_publisher(Float64, PITCH_CMD_TOPIC, 10)
@@ -187,6 +289,10 @@ class GimbalLevelingController(Node):
         self._base_baseline_q = None
         self._tray_baseline_q = None
         self._tray_seen = False
+        self._latest_cmd_lin = 0.0
+        self._latest_cmd_ang = 0.0
+        self.activity_gate = ActivityGate()
+        self._start_time = self.get_clock().now()
 
         # Phase 1 상태
         self.pitch_filtered = 0.0
@@ -219,30 +325,38 @@ class GimbalLevelingController(Node):
         )
 
     # -- 콜백 ----------------------------------------------------------------
+    def _elapsed_sec(self) -> float:
+        return (self.get_clock().now() - self._start_time).nanoseconds * 1e-9
+
+    def _on_cmd_vel(self, msg: Twist):
+        self._latest_cmd_lin = msg.linear.x
+        self._latest_cmd_ang = msg.angular.z
+
     def _on_base_imu(self, msg: Imu):
         self._latest_base = msg
-        if self._base_baseline_q is None:
+        if self._base_baseline_q is None and self._elapsed_sec() >= SETTLE_TIME_SEC:
             q = (msg.orientation.x, msg.orientation.y, msg.orientation.z, msg.orientation.w)
             self._base_baseline_q = quat_conjugate(q)
 
     def _on_tray_imu(self, msg: Imu):
         self._latest_tray = msg
         if self._tray_baseline_q is None:
+            if self._elapsed_sec() < SETTLE_TIME_SEC:
+                return
             q = (msg.orientation.x, msg.orientation.y, msg.orientation.z, msg.orientation.w)
             self._tray_baseline_q = quat_conjugate(q)
-        if not self._tray_seen:
+            self._tray_accel0 = (msg.linear_acceleration.x, msg.linear_acceleration.y,
+                                  msg.linear_acceleration.z)
             self._tray_seen = True
-            self.get_logger().info("tray IMU 감지됨 — 이후부터 보정 trim + 슬로싱 추정 활성화")
+            self.get_logger().info("tray IMU 정착 완료 — 이후부터 보정 trim + 슬로싱 추정 활성화")
+            return
 
         a = (msg.linear_acceleration.x, msg.linear_acceleration.y, msg.linear_acceleration.z)
-        if self._tray_accel0 is None:
-            self._tray_accel0 = a
-            return
         self._tray_excess = tuple(a[i] - self._tray_accel0[i] for i in range(3))
 
     # -- 메인 루프 -------------------------------------------------------------
     def run_control_step(self):
-        if self._latest_base is None:
+        if self._latest_base is None or self._base_baseline_q is None:
             return
 
         base = self._latest_base
@@ -275,16 +389,12 @@ class GimbalLevelingController(Node):
         self.internal_roll = ROLL_SMOOTH_NEW * raw_target_roll \
             + (1.0 - ROLL_SMOOTH_NEW) * self.internal_roll
 
-        final_target_pitch = self.internal_pitch
-        if abs(final_target_pitch) < DEADZONE_PITCH_DEG:
-            final_target_pitch = 0.0
+        final_target_pitch = apply_deadband(self.internal_pitch, DEADZONE_PITCH_DEG)
 
-        # roll도 pitch와 동일하게 스무딩+데드존을 거치도록 대칭으로 수정
+        # roll도 pitch와 동일하게 스무딩+데드밴드를 거치도록 대칭으로 수정
         # (원본 Control.cpp는 -roll_filtered를 그대로 ZV에 넣는 비대칭
         # 구조였는데, 정지 상태에서도 roll이 과민반응하는 원인이었다)
-        final_target_roll = self.internal_roll
-        if abs(final_target_roll) < DEADZONE_ROLL_DEG:
-            final_target_roll = 0.0
+        final_target_roll = apply_deadband(self.internal_roll, DEADZONE_ROLL_DEG)
 
         shaped_pitch = self.zv_pitch.apply(final_target_pitch)
         shaped_roll = self.zv_roll.apply(final_target_roll)
@@ -316,12 +426,32 @@ class GimbalLevelingController(Node):
             error_pitch = shaped_pitch - self.tray_pitch_filtered
             target_pitch_deg = shaped_pitch + kp_dyn * error_pitch
 
+        # 활성/대기 게이트: 주행 명령(cmd_vel)이나 실측 자이로/가속도가
+        # 임계값을 넘을 때만 게인이 1로 올라간다. 정지 상태에서는 0으로
+        # 수렴해서 아래 슬로싱 추정 레이어를 사실상 꺼버린다.
+        gyro_deg = math.hypot(rate_roll, rate_pitch)
+        acc_mag = math.hypot(ax, ay)
+        gate = self.activity_gate.update(
+            self._latest_cmd_lin, self._latest_cmd_ang, gyro_deg, acc_mag, DT)
+
         # 추가 레이어: 실시간 물 출렁임(Housner) 추정 보정
-        ex, ey, _ez = self._tray_excess
-        roll_slosh_corr_rad = self.slosh_roll.update(ey)
-        pitch_slosh_corr_rad = self.slosh_pitch.update(ex)
-        target_roll_deg += K_SLOSH * math.degrees(roll_slosh_corr_rad)
-        target_pitch_deg += K_SLOSH * math.degrees(pitch_slosh_corr_rad)
+        # gate가 0에 가까우면(=정지) 추정기를 아예 돌리지 않고 내부 상태를
+        # 0으로 유지한다 — 감쇠비를 올려도 완전한 무입력 상태를 보장하는
+        # 편이 안전하고, 다시 활성화될 때 잔류 에너지 없이 깨끗하게 시작한다.
+        if gate > 0.01:
+            ex, ey, _ez = self._tray_excess
+            ex = apply_deadband(ex, SLOSH_FORCING_DEADBAND)
+            ey = apply_deadband(ey, SLOSH_FORCING_DEADBAND)
+            roll_slosh_corr_rad = self.slosh_roll.update(ey)
+            pitch_slosh_corr_rad = self.slosh_pitch.update(ex)
+        else:
+            self.slosh_roll.xi = self.slosh_roll.xi_dot = 0.0
+            self.slosh_pitch.xi = self.slosh_pitch.xi_dot = 0.0
+            roll_slosh_corr_rad = 0.0
+            pitch_slosh_corr_rad = 0.0
+
+        target_roll_deg += gate * K_SLOSH * math.degrees(roll_slosh_corr_rad)
+        target_pitch_deg += gate * K_SLOSH * math.degrees(pitch_slosh_corr_rad)
 
         # 최종 출력: degree -> radian, 조인트 리밋 클램프 후 출력단 저역통과 필터
         roll_cmd_raw = max(-JOINT_LIMIT_RAD, min(JOINT_LIMIT_RAD, math.radians(target_roll_deg)))

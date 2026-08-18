@@ -29,17 +29,7 @@
         </plugin>
 
         <plugin filename="gz-sim-imu-system" name="gz::sim::systems::Imu"></plugin>
-
-        <plugin filename="gz-sim-pose-publisher-system" name="gz::sim::systems::PosePublisher">
-            <publish_link_pose>true</publish_link_pose>
-            <publish_model_pose>false</publish_model_pose>
-            <publish_visual_pose>false</publish_visual_pose>
-            <publish_collision_pose>false</publish_collision_pose>
-            <publish_sensor_pose>false</publish_sensor_pose>
-            <use_pose_vector_msg>true</use_pose_vector_msg>
-            <static_publisher>false</static_publisher>
-        </plugin>
-
+        
     </gazebo>
     <gazebo reference="root">
         <sensor name="chassis_imu" type="imu">
@@ -190,9 +180,9 @@
     </link>
     <link name="default">
         <inertial>
-            <mass value="0.000267863" />
+            <mass value="0.015" />
             <origin xyz="-0.01725 0.018 -2.77556e-17" rpy="0 -0 0" />
-            <inertia ixx="2.46436e-06" ixy="0" ixz="0" iyy="2.46436e-06" iyz="0" izz="6.70047e-08" />
+            <inertia ixx="0.000138" ixy="0" ixz="0" iyy="0.000138" iyz="0" izz="0.00000375" />
         </inertial>
         <visual>
             <origin xyz="-0.01025 0.006 0.165" rpy="0 -0 0" />
@@ -212,9 +202,9 @@
     </link>
     <link name="default_1">
         <inertial>
-            <mass value="0.000267863" />
+            <mass value="0.015" />
             <origin xyz="-3.46945e-18 -3.46945e-18 -0.165" rpy="0 -0 0" />
-            <inertia ixx="2.46436e-06" ixy="0" ixz="0" iyy="2.46436e-06" iyz="0" izz="6.70047e-08" />
+            <inertia ixx="0.000138" ixy="0" ixz="0" iyy="0.000138" iyz="0" izz="0.00000375" />
         </inertial>
         <visual>
             <origin xyz="0.007 -0.012 0" rpy="0 -0 0" />
@@ -234,9 +224,9 @@
     </link>
     <link name="default_10">
         <inertial>
-            <mass value="0.000267863" />
+            <mass value="0.015" />
             <origin xyz="-3.46945e-18 -3.46945e-18 -0.165" rpy="0 -0 0" />
-            <inertia ixx="2.46436e-06" ixy="0" ixz="0" iyy="2.46436e-06" iyz="0" izz="6.70047e-08" />
+            <inertia ixx="0.000138" ixy="0" ixz="0" iyy="0.000138" iyz="0" izz="0.00000375" />
         </inertial>
         <visual>
             <origin xyz="0.007 -0.012 0" rpy="0 -0 0" />
@@ -256,9 +246,9 @@
     </link>
     <link name="default_11">
         <inertial>
-            <mass value="0.000267863" />
+            <mass value="0.015" />
             <origin xyz="-0.01725 -0.018 -2.77556e-17" rpy="0 -0 0" />
-            <inertia ixx="2.46436e-06" ixy="0" ixz="0" iyy="2.46436e-06" iyz="0" izz="6.70047e-08" />
+            <inertia ixx="0.000138" ixy="0" ixz="0" iyy="0.000138" iyz="0" izz="0.00000375" />
         </inertial>
         <visual>
             <origin xyz="-0.01025 -0.03 0.165" rpy="0 -0 0" />
@@ -278,9 +268,9 @@
     </link>
     <link name="default_12">
         <inertial>
-            <mass value="0.000267863" />
+            <mass value="0.015" />
             <origin xyz="-0.01725 -0.018 -2.77556e-17" rpy="0 -0 0" />
-            <inertia ixx="2.46436e-06" ixy="0" ixz="0" iyy="2.46436e-06" iyz="0" izz="6.70047e-08" />
+            <inertia ixx="0.000138" ixy="0" ixz="0" iyy="0.000138" iyz="0" izz="0.00000375" />
         </inertial>
         <visual>
             <origin xyz="-0.01025 -0.03 0.165" rpy="0 -0 0" />
@@ -300,9 +290,9 @@
     </link>
     <link name="default_13">
         <inertial>
-            <mass value="0.000267863" />
+            <mass value="0.015" />
             <origin xyz="-3.46945e-18 -3.46945e-18 -0.165" rpy="0 -0 0" />
-            <inertia ixx="2.46436e-06" ixy="0" ixz="0" iyy="2.46436e-06" iyz="0" izz="6.70047e-08" />
+            <inertia ixx="0.000138" ixy="0" ixz="0" iyy="0.000138" iyz="0" izz="0.00000375" />
         </inertial>
         <visual>
             <origin xyz="0.007 -0.012 0" rpy="0 -0 0" />
@@ -322,9 +312,9 @@
     </link>
     <link name="default_2">
         <inertial>
-            <mass value="0.000267863" />
+            <mass value="0.015" />
             <origin xyz="-3.46945e-18 -3.46945e-18 -0.165" rpy="0 -0 0" />
-            <inertia ixx="2.46436e-06" ixy="0" ixz="0" iyy="2.46436e-06" iyz="0" izz="6.70047e-08" />
+            <inertia ixx="0.000138" ixy="0" ixz="0" iyy="0.000138" iyz="0" izz="0.00000375" />
         </inertial>
         <visual>
             <origin xyz="0.007 -0.012 0" rpy="0 -0 0" />
@@ -344,9 +334,9 @@
     </link>
     <link name="default_3">
         <inertial>
-            <mass value="0.000267863" />
+            <mass value="0.015" />
             <origin xyz="-3.46945e-18 -3.46945e-18 0.165" rpy="0 -0 0" />
-            <inertia ixx="2.46436e-06" ixy="0" ixz="0" iyy="2.46436e-06" iyz="0" izz="6.70047e-08" />
+            <inertia ixx="0.000138" ixy="0" ixz="0" iyy="0.000138" iyz="0" izz="0.00000375" />
         </inertial>
         <visual>
             <origin xyz="0.007 -0.012 0.33" rpy="0 -0 0" />
@@ -366,9 +356,9 @@
     </link>
     <link name="default_4">
         <inertial>
-            <mass value="0.000267863" />
+            <mass value="0.015" />
             <origin xyz="-0.00375 0.018 0.165" rpy="0 -0 0" />
-            <inertia ixx="2.46436e-06" ixy="0" ixz="0" iyy="2.46436e-06" iyz="0" izz="6.70047e-08" />
+            <inertia ixx="0.000138" ixy="0" ixz="0" iyy="0.000138" iyz="0" izz="0.00000375" />
         </inertial>
         <visual>
             <origin xyz="0.00325 0.006 0.33" rpy="0 -0 0" />
@@ -388,9 +378,9 @@
     </link>
     <link name="default_5">
         <inertial>
-            <mass value="0.000267863" />
+            <mass value="0.015" />
             <origin xyz="-3.46945e-18 -0.0075 0.165" rpy="0 -0 0" />
-            <inertia ixx="2.46436e-06" ixy="0" ixz="0" iyy="2.46436e-06" iyz="0" izz="6.70047e-08" />
+            <inertia ixx="0.000138" ixy="0" ixz="0" iyy="0.000138" iyz="0" izz="0.00000375" />
         </inertial>
         <visual>
             <origin xyz="0.007 -0.0195 0.33" rpy="0 -0 0" />
@@ -410,9 +400,9 @@
     </link>
     <link name="default_6">
         <inertial>
-            <mass value="0.000267863" />
+            <mass value="0.015" />
             <origin xyz="-0.01725 -0.018 -2.77556e-17" rpy="0 -0 0" />
-            <inertia ixx="2.46436e-06" ixy="0" ixz="0" iyy="2.46436e-06" iyz="0" izz="6.70047e-08" />
+            <inertia ixx="0.000138" ixy="0" ixz="0" iyy="0.000138" iyz="0" izz="0.00000375" />
         </inertial>
         <visual>
             <origin xyz="-0.01025 -0.03 0.165" rpy="0 -0 0" />
@@ -432,9 +422,9 @@
     </link>
     <link name="default_7">
         <inertial>
-            <mass value="0.000267863" />
+            <mass value="0.015" />
             <origin xyz="-3.46945e-18 -0.0075 -2.77556e-17" rpy="0 -0 0" />
-            <inertia ixx="2.46436e-06" ixy="0" ixz="0" iyy="2.46436e-06" iyz="0" izz="6.70047e-08" />
+            <inertia ixx="0.000138" ixy="0" ixz="0" iyy="0.000138" iyz="0" izz="0.00000375" />
         </inertial>
         <visual>
             <origin xyz="0.007 -0.0195 0.165" rpy="0 -0 0" />
@@ -454,9 +444,9 @@
     </link>
     <link name="default_8">
         <inertial>
-            <mass value="0.000267863" />
+            <mass value="0.015" />
             <origin xyz="-3.46945e-18 -0.0075 0.165" rpy="0 -0 0" />
-            <inertia ixx="2.46436e-06" ixy="0" ixz="0" iyy="2.46436e-06" iyz="0" izz="6.70047e-08" />
+            <inertia ixx="0.000138" ixy="0" ixz="0" iyy="0.000138" iyz="0" izz="0.00000375" />
         </inertial>
         <visual>
             <origin xyz="0.007 -0.0195 0.33" rpy="0 -0 0" />
@@ -476,9 +466,9 @@
     </link>
     <link name="default_9">
         <inertial>
-            <mass value="0.000267863" />
+            <mass value="0.015" />
             <origin xyz="-0.01725 0.018 -2.77556e-17" rpy="0 -0 0" />
-            <inertia ixx="2.46436e-06" ixy="0" ixz="0" iyy="2.46436e-06" iyz="0" izz="6.70047e-08" />
+            <inertia ixx="0.000138" ixy="0" ixz="0" iyy="0.000138" iyz="0" izz="0.00000375" />
         </inertial>
         <visual>
             <origin xyz="-0.01025 0.006 0.165" rpy="0 -0 0" />
@@ -894,9 +884,9 @@
     </link>
     <link name="part_1_1">
         <inertial>
-            <mass value="2.44526e-05" />
+            <mass value="0.15" />
             <origin xyz="2.60209e-18 -8.13152e-18 -0.026" rpy="0 -0 1.00353" />
-            <inertia ixx="9.07026e-09" ixy="0" ixz="0" iyy="9.07026e-09" iyz="0" izz="7.12055e-09" />
+            <inertia ixx="0.000475" ixy="0" ixz="0" iyy="0.000475" iyz="0" izz="0.000827" />
         </inertial>
         <visual>
             <origin xyz="0.00196507 0.00070444 0" rpy="0 -0 1.00353" />
@@ -960,9 +950,9 @@
     </link>
     <link name="part_1_12">
         <inertial>
-            <mass value="2.44526e-05" />
+            <mass value="0.15" />
             <origin xyz="-5.42101e-18 -6.72205e-18 -0.026" rpy="0 -0 0" />
-            <inertia ixx="9.07026e-09" ixy="0" ixz="0" iyy="9.07026e-09" iyz="0" izz="7.12055e-09" />
+            <inertia ixx="0.000475" ixy="0" ixz="0" iyy="0.000475" iyz="0" izz="0.000827" />
         </inertial>
         <visual>
             <origin xyz="0.00165 -0.00127877 0" rpy="0 -0 0" />
@@ -982,9 +972,9 @@
     </link>
     <link name="part_1_13">
         <inertial>
-            <mass value="2.44526e-05" />
+            <mass value="0.15" />
             <origin xyz="-5.42101e-18 -6.72205e-18 -0.026" rpy="0 -0 0" />
-            <inertia ixx="9.07026e-09" ixy="0" ixz="0" iyy="9.07026e-09" iyz="0" izz="7.12055e-09" />
+            <inertia ixx="0.000475" ixy="0" ixz="0" iyy="0.000475" iyz="0" izz="0.000827" />
         </inertial>
         <visual>
             <origin xyz="0.00165 -0.00127877 0" rpy="0 -0 0" />
@@ -1291,9 +1281,9 @@
 
     <link name="part_1_9">
         <inertial>
-            <mass value="2.44526e-05" />
+            <mass value="0.15" />
             <origin xyz="6.50521e-18 -5.20417e-18 0.026" rpy="0 -0 1.56379" />
-            <inertia ixx="9.07026e-09" ixy="0" ixz="0" iyy="9.07026e-09" iyz="0" izz="7.12055e-09" />
+            <inertia ixx="0.000475" ixy="0" ixz="0" iyy="0.000475" iyz="0" izz="0.000827" />
         </inertial>
         <visual>
             <origin xyz="0.00129029 0.00164101 0.052" rpy="0 -0 1.56379" />
