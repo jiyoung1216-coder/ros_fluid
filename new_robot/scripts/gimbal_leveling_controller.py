@@ -79,9 +79,17 @@ KP_MIN_DEG = 0.05
 KP_MAX_DEG = 0.30
 ERROR_MAX_DEG = 15.0
 
+# trim/슬로싱 보정은 베이스 레벨링 목표각(shaped_roll/pitch) 위에 "얹히는"
+# 값이라, 업스트림(트레이 IMU 드리프트 등)이 어떤 이상한 값을 내놓든
+# 이 폭 이상으로는 목표각을 밀어붙이지 못하도록 상한을 둔다. 이게 없으면
+# trim/슬로싱 계산값이 폭주할 때 목표각이 조인트 리밋(JOINT_LIMIT_RAD)까지
+# 끝까지 밀려서 짐벌이 한계각에 짓눌린 채 계속 진동하는 문제가 있었다.
+TRIM_MAX_DEG = 5.0
+SLOSH_MAX_DEG = 5.0
+
 JOINT_LIMIT_RAD = 0.4363  # ±25°
 
-OUTPUT_SMOOTH = 0.08  # 최종 출력 저역통과 필터. 0에 가까울수록 부드럽고 느림
+OUTPUT_SMOOTH = 0.05  # 최종 출력 저역통과 필터. 0에 가까울수록 부드럽고 느림
 
 # ---------------------------------------------------------------------------
 # 축 부호 설정 — 시뮬레이션에서 실제로 기울여보고 검증/조정할 것
@@ -107,8 +115,8 @@ FILL_HEIGHT = 0.09
 # 대신, 보정 신호가 빨리 잦아들도록 의도적으로 높인 "제어용" 감쇠비.
 SLOSH_DAMPING_RATIO = 0.2
 # 이 이하의 초과가속도(센서 노이즈 수준)는 추정기에 아예 입력하지 않는다.
-SLOSH_FORCING_DEADBAND = 0.10  # m/s^2
-K_SLOSH = 0.3
+SLOSH_FORCING_DEADBAND = 0.15  # m/s^2
+K_SLOSH = 0.15
 LAMBDA1 = 1.8412
 
 # ---------------------------------------------------------------------------
@@ -123,11 +131,11 @@ ACTIVE_ENTER_CMDVEL_ANG = 0.05  # rad/s
 ACTIVE_EXIT_CMDVEL_LIN = 0.01
 ACTIVE_EXIT_CMDVEL_ANG = 0.02
 
-ACTIVE_ENTER_GYRO_DEG = 3.0  # deg/s, base 자이로 rate 크기
-ACTIVE_EXIT_GYRO_DEG = 1.0
+ACTIVE_ENTER_GYRO_DEG = 5.0  # deg/s, base 자이로 rate 크기
+ACTIVE_EXIT_GYRO_DEG = 2.0
 
-ACTIVE_ENTER_ACC = 0.25  # m/s^2, base 가속도(x,y) 크기
-ACTIVE_EXIT_ACC = 0.10
+ACTIVE_ENTER_ACC = 0.4  # m/s^2, base 가속도(x,y) 크기
+ACTIVE_EXIT_ACC = 0.15
 
 GATE_ATTACK_TAU = 0.15  # s — 외란 감지 시 빠르게 활성화
 GATE_RELEASE_TAU = 0.6  # s — 정지로 판단되면 완만하게 대기 상태로 복귀
@@ -417,14 +425,22 @@ class GimbalLevelingController(Node):
                 + (1.0 - ALPHA_TRAY) * tray_pitch_acc
             self.tray_roll_filtered = ALPHA_TRAY * (self.tray_roll_filtered + tray_rate_roll * DT) \
                 + (1.0 - ALPHA_TRAY) * tray_roll_acc
+            # 자이로를 거의 그대로 적분하는 필터(alpha=0.995)라, 물리적으로
+            # 큰 각속도가 한동안 들어오면 실제 각도와 무관하게 계속 표류할
+            # 수 있다. 짐벌 자체가 물리적으로 낼 수 있는 각도보다 훨씬 큰
+            # 값으로는 못 가게 안전 범위로 묶어둔다.
+            self.tray_pitch_filtered = max(-90.0, min(90.0, self.tray_pitch_filtered))
+            self.tray_roll_filtered = max(-90.0, min(90.0, self.tray_roll_filtered))
 
             error_roll = shaped_roll - self.tray_roll_filtered
             ratio = max(0.0, min(1.0, abs(error_roll) / ERROR_MAX_DEG))
             kp_dyn = KP_MIN_DEG + (KP_MAX_DEG - KP_MIN_DEG) * ratio * ratio
-            target_roll_deg = shaped_roll + kp_dyn * error_roll
+            trim_roll = max(-TRIM_MAX_DEG, min(TRIM_MAX_DEG, kp_dyn * error_roll))
+            target_roll_deg = shaped_roll + trim_roll
 
             error_pitch = shaped_pitch - self.tray_pitch_filtered
-            target_pitch_deg = shaped_pitch + kp_dyn * error_pitch
+            trim_pitch = max(-TRIM_MAX_DEG, min(TRIM_MAX_DEG, kp_dyn * error_pitch))
+            target_pitch_deg = shaped_pitch + trim_pitch
 
         # 활성/대기 게이트: 주행 명령(cmd_vel)이나 실측 자이로/가속도가
         # 임계값을 넘을 때만 게인이 1로 올라간다. 정지 상태에서는 0으로
@@ -450,8 +466,12 @@ class GimbalLevelingController(Node):
             roll_slosh_corr_rad = 0.0
             pitch_slosh_corr_rad = 0.0
 
-        target_roll_deg += gate * K_SLOSH * math.degrees(roll_slosh_corr_rad)
-        target_pitch_deg += gate * K_SLOSH * math.degrees(pitch_slosh_corr_rad)
+        slosh_roll_deg = max(-SLOSH_MAX_DEG, min(SLOSH_MAX_DEG,
+                             gate * K_SLOSH * math.degrees(roll_slosh_corr_rad)))
+        slosh_pitch_deg = max(-SLOSH_MAX_DEG, min(SLOSH_MAX_DEG,
+                              gate * K_SLOSH * math.degrees(pitch_slosh_corr_rad)))
+        target_roll_deg += slosh_roll_deg
+        target_pitch_deg += slosh_pitch_deg
 
         # 최종 출력: degree -> radian, 조인트 리밋 클램프 후 출력단 저역통과 필터
         roll_cmd_raw = max(-JOINT_LIMIT_RAD, min(JOINT_LIMIT_RAD, math.radians(target_roll_deg)))
@@ -464,6 +484,16 @@ class GimbalLevelingController(Node):
 
         self.roll_pub.publish(Float64(data=self.roll_cmd_filtered))
         self.pitch_pub.publish(Float64(data=self.pitch_cmd_filtered))
+
+        # 디버그: roll 쪽 각 단계 값을 분리해서 확인 (원인 파악용, 끝나면 지울 것)
+        self.get_logger().info(
+            f"roll_filtered={self.roll_filtered:.2f}deg "
+            f"internal_roll={self.internal_roll:.2f}deg "
+            f"shaped_roll={shaped_roll:.2f}deg "
+            f"trim_roll={trim_roll if self._tray_seen else 0.0:.2f}deg "
+            f"slosh_roll={slosh_roll_deg:.2f}deg "
+            f"target_roll={target_roll_deg:.2f}deg",
+            throttle_duration_sec=0.3)
 
 
 def main(args=None):

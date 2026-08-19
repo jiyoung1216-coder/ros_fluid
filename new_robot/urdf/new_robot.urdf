@@ -18,14 +18,14 @@
             <topic>/gimbal_roll_cmd</topic>
             <p_gain>20</p_gain>
             <i_gain>0</i_gain>
-            <d_gain>1.5</d_gain>
+            <d_gain>15</d_gain>
         </plugin>
             <plugin filename="gz-sim-joint-position-controller-system" name="gz::sim::systems::JointPositionController">
             <joint_name>revolute_2</joint_name>
             <topic>/gimbal_pitch_cmd</topic>
             <p_gain>20</p_gain>
             <i_gain>0</i_gain>
-            <d_gain>1.5</d_gain>
+            <d_gain>15</d_gain>
         </plugin>
 
         <plugin filename="gz-sim-imu-system" name="gz::sim::systems::Imu"></plugin>
@@ -1842,7 +1842,7 @@
         <parent link="m3_ÂÝÎÆ__1" />
         <child link="default_4" />
         <limit lower="-0.4363" upper="0.4363" effort="10" velocity="3.0" />
-        <dynamics damping="0.2" friction="0.05" />
+        <dynamics damping="0.3" friction="0.2" />
     </joint>
     <joint name="revolute_2" type="revolute">
         <origin xyz="-2.26874e-13 2.35922e-14 0.0103" rpy="-1.5708 8.67362e-17 0.0184253" />
@@ -1850,21 +1850,21 @@
         <parent link="m3_ÂÝÎÆ__1_1" />
         <child link="default_7" />
         <limit lower="-0.4363" upper="0.4363" effort="10" velocity="3.0" />
-        <dynamics damping="0.2" friction="0.05" />
+        <dynamics damping="0.3" friction="0.2" />
     </joint>
     <joint name="revolute_3" type="continuous">
         <origin xyz="0.0345368 0.252 0.0089941" rpy="-1.5708 -0 1.5708" />
         <axis xyz="0 0 1" />
         <parent link="body2_1" />
         <child link="part_1_1" />
-        <dynamics damping="0.02" friction="0.01" />
+        <dynamics damping="0.3" friction="0.2" />
     </joint>
     <joint name="revolute_4" type="continuous">
         <origin xyz="0.0345368 0.252 0.0089941" rpy="-1.5708 -0.00700221 1.5708" />
         <axis xyz="-0 -0 1" />
         <parent link="body2" />
         <child link="part_1_13" />
-        <dynamics damping="0.02" friction="0.01" />
+        <dynamics damping="0.3" friction="0.2" />
     </joint>
     <joint name="revolute_5" type="continuous">
         <origin xyz="-0.0354632 0.252 0.0089941" rpy="1.5708 1.56379 1.5708" />
