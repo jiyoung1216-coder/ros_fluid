@@ -100,7 +100,7 @@
       <parameter key="RigidAlgorithm" value="1" comment="강체 알고리즘" />
       <parameter key="FtPause" value="0" />
       <parameter key="CoefDtMin" value="0.05" />
-      <parameter key="TimeMax" value="48.55" comment="총 시뮬레이션 시간(초), new_robot_accel.csv 전체 길이와 일치" />
+      <parameter key="TimeMax" value="23.19" comment="총 시뮬레이션 시간(초), new_robot_accel.csv 전체 길이와 일치" />
       <parameter key="TimeOut" value="0.05" comment="결과 저장 간격(초)" />
       <parameter key="IncZ" value="0" />
     </parameters>

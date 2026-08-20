@@ -131,11 +131,16 @@ ACTIVE_ENTER_CMDVEL_ANG = 0.05  # rad/s
 ACTIVE_EXIT_CMDVEL_LIN = 0.01
 ACTIVE_EXIT_CMDVEL_ANG = 0.02
 
-ACTIVE_ENTER_GYRO_DEG = 5.0  # deg/s, base 자이로 rate 크기
-ACTIVE_EXIT_GYRO_DEG = 2.0
+# 정지 상태 실측 기준(2026-08-20 세션): gyro_deg 1.5~18deg/s, acc_mag
+# 15~90(가끔 200대 스파이크) 수준의 잔여 물리 노이즈가 있음을 확인.
+# 그 노이즈 위에 확실히 걸리도록 임계값을 재조정했다 — 물리적으로 완전히
+# 0을 만드는 것보다, 이 노이즈 바닥 위에서 게이트가 안정적으로 꺼지게
+# 하는 쪽을 택함.
+ACTIVE_ENTER_GYRO_DEG = 25.0  # deg/s, base 자이로 rate 크기
+ACTIVE_EXIT_GYRO_DEG = 15.0
 
-ACTIVE_ENTER_ACC = 0.4  # m/s^2, base 가속도(x,y) 크기
-ACTIVE_EXIT_ACC = 0.15
+ACTIVE_ENTER_ACC = 250.0  # m/s^2, base 가속도(x,y) 크기
+ACTIVE_EXIT_ACC = 150.0
 
 GATE_ATTACK_TAU = 0.15  # s — 외란 감지 시 빠르게 활성화
 GATE_RELEASE_TAU = 0.6  # s — 정지로 판단되면 완만하게 대기 상태로 복귀
@@ -222,6 +227,23 @@ def quat_to_roll_pitch_deg(q):
     pitch = math.asin(sinp)
 
     return math.degrees(roll), math.degrees(pitch)
+
+def quat_to_matrix(q):
+    x, y, z, w = q
+    return (
+        (1 - 2 * (y * y + z * z), 2 * (x * y - z * w),     2 * (x * z + y * w)),
+        (2 * (x * y + z * w),     1 - 2 * (x * x + z * z), 2 * (y * z - x * w)),
+        (2 * (x * z - y * w),     2 * (y * z + x * w),     1 - 2 * (x * x + y * y)),
+    )
+
+
+def mat_transpose_vec_mul(R, v):
+    """R^T @ v"""
+    return (
+        R[0][0] * v[0] + R[1][0] * v[1] + R[2][0] * v[2],
+        R[0][1] * v[0] + R[1][1] * v[1] + R[2][1] * v[2],
+        R[0][2] * v[0] + R[1][2] * v[1] + R[2][2] * v[2],
+    )
 
 
 class ConvolvedZV:
@@ -385,12 +407,12 @@ class GimbalLevelingController(Node):
             + (1.0 - ALPHA_BASE) * roll_acc
 
         # Phase 2: 관성 보상 목표각 + ZV
-        ax = base.linear_acceleration.x * ACC_ROLL_SIGN
-        ay = base.linear_acceleration.y * ACC_PITCH_SIGN
-        a_linear_y = ay - G * math.sin(math.radians(self.pitch_filtered))
-        a_linear_x = ax - G * math.sin(math.radians(self.roll_filtered))
-        raw_target_pitch = math.degrees(math.atan2(a_linear_y, G))
-        raw_target_roll = math.degrees(math.atan2(a_linear_x, G))
+        q_now = (base.orientation.x, base.orientation.y, base.orientation.z, base.orientation.w)
+        gravity_local = mat_transpose_vec_mul(quat_to_matrix(q_now), (0.0, 0.0, G))
+        ax = (base.linear_acceleration.x - gravity_local[0]) * ACC_ROLL_SIGN
+        ay = (base.linear_acceleration.y - gravity_local[1]) * ACC_PITCH_SIGN
+        raw_target_pitch = math.degrees(math.atan2(ay, G))
+        raw_target_roll = math.degrees(math.atan2(ax, G))
 
         self.internal_pitch = PITCH_SMOOTH_NEW * raw_target_pitch \
             + (1.0 - PITCH_SMOOTH_NEW) * self.internal_pitch
@@ -512,11 +534,12 @@ def main(args=None):
     node = GimbalLevelingController()
     try:
         rclpy.spin(node)
-    except KeyboardInterrupt:
+    except (KeyboardInterrupt, RuntimeError):
         pass
     finally:
         node.destroy_node()
-        rclpy.shutdown()
+        if rclpy.ok():
+            rclpy.shutdown()
 
 
 if __name__ == "__main__":

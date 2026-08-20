@@ -41,7 +41,7 @@
         </plugin>
 
     </gazebo>
-    <gazebo reference="root">
+    <gazebo reference="body2">
         <sensor name="chassis_imu" type="imu">
             <always_on>true</always_on>
             <update_rate>100</update_rate>
@@ -71,12 +71,6 @@
                 <color rgba="0.498039 0.498039 0.498039 1" />
             </material>
         </visual>
-        <collision>
-            <origin xyz="2.26912e-13 -2.36572e-14 0.02255" rpy="0 -0 0" />
-            <geometry>
-                <mesh filename="package://new_robot/meshes/BJJ02040274_GL60II_______1_solid1.stl" scale="1 1 1" />
-            </geometry>
-        </collision>
     </link>
     <link name="bjj02040274_gl60ii_Å_à_Ç_1_solid1_1">
         <inertial>
@@ -93,12 +87,6 @@
                 <color rgba="0.498039 0.498039 0.498039 1" />
             </material>
         </visual>
-        <collision>
-            <origin xyz="2.26912e-13 -2.36572e-14 0.0233" rpy="0 -0 0" />
-            <geometry>
-                <mesh filename="package://new_robot/meshes/BJJ02040274_GL60II_______1_solid1.stl" scale="1 1 1" />
-            </geometry>
-        </collision>
     </link>
     <link name="body2">
         <inertial>
@@ -115,13 +103,29 @@
                 <color rgba="0.627451 0.627451 0.627451 1" />
             </material>
         </visual>
-        <collision>
+            <collision>
             <origin xyz="-0.000577482 0 -0.00508349" rpy="0 -0 0" />
             <geometry>
-                <mesh filename="package://new_robot/meshes/Body2.stl" scale="1 1 1" />
+                <box size="0.1 0.1 0.06" />
             </geometry>
+            <surface>
+                <contact>
+                    <ode>
+                        <kp>1e5</kp>
+                        <kd>10</kd>
+                        <max_vel>0.1</max_vel>
+                        <min_depth>0.001</min_depth>
+                    </ode>
+                </contact>
+                <friction>
+                    <ode>
+                        <mu>0.8</mu>
+                        <mu2>0.8</mu2>
+                    </ode>
+                </friction>
+            </surface>
         </collision>
-    </link>
+</link>
     <link name="body2_1">
         <inertial>
             <mass value="0.08" />
@@ -137,13 +141,13 @@
                 <color rgba="0.627451 0.627451 0.627451 1" />
             </material>
         </visual>
-        <collision>
+            <collision>
             <origin xyz="-0.000577482 0 -0.00508349" rpy="0 -0 0" />
             <geometry>
-                <mesh filename="package://new_robot/meshes/Body2.stl" scale="1 1 1" />
+                <box size="0.1 0.1 0.06" />
             </geometry>
         </collision>
-    </link>
+</link>
     <link name="body2_2">
         <inertial>
             <mass value="0.08" />
@@ -159,13 +163,13 @@
                 <color rgba="0.627451 0.627451 0.627451 1" />
             </material>
         </visual>
-        <collision>
+            <collision>
             <origin xyz="-0.000577482 0 -0.00508349" rpy="0 -0 0" />
             <geometry>
-                <mesh filename="package://new_robot/meshes/Body2.stl" scale="1 1 1" />
+                <box size="0.1 0.1 0.06" />
             </geometry>
         </collision>
-    </link>
+</link>
     <link name="body2_3">
         <inertial>
             <mass value="0.08" />
@@ -181,13 +185,13 @@
                 <color rgba="0.627451 0.627451 0.627451 1" />
             </material>
         </visual>
-        <collision>
+            <collision>
             <origin xyz="0 0 0" rpy="0 -0 0" />
             <geometry>
-                <mesh filename="package://new_robot/meshes/Body2.stl" scale="1 1 1" />
+                <box size="0.1 0.1 0.06" />
             </geometry>
         </collision>
-    </link>
+</link>
     <link name="default">
         <inertial>
             <mass value="0.000267863" />
@@ -203,12 +207,6 @@
                 <color rgba="0.866667 0.909804 1 1" />
             </material>
         </visual>
-        <collision>
-            <origin xyz="-0.01025 0.006 0.165" rpy="0 -0 0" />
-            <geometry>
-                <mesh filename="package://new_robot/meshes/Default.stl" scale="1 1 1" />
-            </geometry>
-        </collision>
     </link>
     <link name="default_1">
         <inertial>
@@ -225,12 +223,6 @@
                 <color rgba="0.866667 0.909804 1 1" />
             </material>
         </visual>
-        <collision>
-            <origin xyz="0.007 -0.012 0" rpy="0 -0 0" />
-            <geometry>
-                <mesh filename="package://new_robot/meshes/Default.stl" scale="1 1 1" />
-            </geometry>
-        </collision>
     </link>
     <link name="default_10">
         <inertial>
@@ -247,12 +239,6 @@
                 <color rgba="0.866667 0.909804 1 1" />
             </material>
         </visual>
-        <collision>
-            <origin xyz="0.007 -0.012 0" rpy="0 -0 0" />
-            <geometry>
-                <mesh filename="package://new_robot/meshes/Default.stl" scale="1 1 1" />
-            </geometry>
-        </collision>
     </link>
     <link name="default_11">
         <inertial>
@@ -269,12 +255,6 @@
                 <color rgba="0.866667 0.909804 1 1" />
             </material>
         </visual>
-        <collision>
-            <origin xyz="-0.01025 -0.03 0.165" rpy="0 -0 0" />
-            <geometry>
-                <mesh filename="package://new_robot/meshes/Default.stl" scale="1 1 1" />
-            </geometry>
-        </collision>
     </link>
     <link name="default_12">
         <inertial>
@@ -291,12 +271,6 @@
                 <color rgba="0.866667 0.909804 1 1" />
             </material>
         </visual>
-        <collision>
-            <origin xyz="-0.01025 -0.03 0.165" rpy="0 -0 0" />
-            <geometry>
-                <mesh filename="package://new_robot/meshes/Default.stl" scale="1 1 1" />
-            </geometry>
-        </collision>
     </link>
     <link name="default_13">
         <inertial>
@@ -313,12 +287,6 @@
                 <color rgba="0.866667 0.909804 1 1" />
             </material>
         </visual>
-        <collision>
-            <origin xyz="0.007 -0.012 0" rpy="0 -0 0" />
-            <geometry>
-                <mesh filename="package://new_robot/meshes/Default.stl" scale="1 1 1" />
-            </geometry>
-        </collision>
     </link>
     <link name="default_2">
         <inertial>
@@ -335,12 +303,6 @@
                 <color rgba="0.866667 0.909804 1 1" />
             </material>
         </visual>
-        <collision>
-            <origin xyz="0.007 -0.012 0" rpy="0 -0 0" />
-            <geometry>
-                <mesh filename="package://new_robot/meshes/Default.stl" scale="1 1 1" />
-            </geometry>
-        </collision>
     </link>
     <link name="default_3">
         <inertial>
@@ -357,12 +319,6 @@
                 <color rgba="0.866667 0.909804 1 1" />
             </material>
         </visual>
-        <collision>
-            <origin xyz="0.007 -0.012 0.33" rpy="0 -0 0" />
-            <geometry>
-                <mesh filename="package://new_robot/meshes/Default.stl" scale="1 1 1" />
-            </geometry>
-        </collision>
     </link>
     <link name="default_4">
         <inertial>
@@ -379,12 +335,6 @@
                 <color rgba="0.866667 0.909804 1 1" />
             </material>
         </visual>
-        <collision>
-            <origin xyz="0.00325 0.006 0.33" rpy="0 -0 0" />
-            <geometry>
-                <mesh filename="package://new_robot/meshes/Default.stl" scale="1 1 1" />
-            </geometry>
-        </collision>
     </link>
     <link name="default_5">
         <inertial>
@@ -401,12 +351,6 @@
                 <color rgba="0.866667 0.909804 1 1" />
             </material>
         </visual>
-        <collision>
-            <origin xyz="0.007 -0.0195 0.33" rpy="0 -0 0" />
-            <geometry>
-                <mesh filename="package://new_robot/meshes/Default.stl" scale="1 1 1" />
-            </geometry>
-        </collision>
     </link>
     <link name="default_6">
         <inertial>
@@ -423,12 +367,6 @@
                 <color rgba="0.866667 0.909804 1 1" />
             </material>
         </visual>
-        <collision>
-            <origin xyz="-0.01025 -0.03 0.165" rpy="0 -0 0" />
-            <geometry>
-                <mesh filename="package://new_robot/meshes/Default.stl" scale="1 1 1" />
-            </geometry>
-        </collision>
     </link>
     <link name="default_7">
         <inertial>
@@ -445,12 +383,6 @@
                 <color rgba="0.866667 0.909804 1 1" />
             </material>
         </visual>
-        <collision>
-            <origin xyz="0.007 -0.0195 0.165" rpy="0 -0 0" />
-            <geometry>
-                <mesh filename="package://new_robot/meshes/Default.stl" scale="1 1 1" />
-            </geometry>
-        </collision>
     </link>
     <link name="default_8">
         <inertial>
@@ -467,12 +399,6 @@
                 <color rgba="0.866667 0.909804 1 1" />
             </material>
         </visual>
-        <collision>
-            <origin xyz="0.007 -0.0195 0.33" rpy="0 -0 0" />
-            <geometry>
-                <mesh filename="package://new_robot/meshes/Default.stl" scale="1 1 1" />
-            </geometry>
-        </collision>
     </link>
     <link name="default_9">
         <inertial>
@@ -489,12 +415,6 @@
                 <color rgba="0.866667 0.909804 1 1" />
             </material>
         </visual>
-        <collision>
-            <origin xyz="-0.01025 0.006 0.165" rpy="0 -0 0" />
-            <geometry>
-                <mesh filename="package://new_robot/meshes/Default.stl" scale="1 1 1" />
-            </geometry>
-        </collision>
     </link>
     <link name="gb_fastener_screws_hshcs_m3x5_s_1_solid1">
         <inertial>
@@ -511,12 +431,6 @@
                 <color rgba="0.768627 0.886275 0.952941 1" />
             </material>
         </visual>
-        <collision>
-            <origin xyz="0 0 0" rpy="0 -0 0" />
-            <geometry>
-                <mesh filename="package://new_robot/meshes/GB_FASTENER_SCREWS_HSHCS_M3X5_S_1_solid1.stl" scale="1 1 1" />
-            </geometry>
-        </collision>
     </link>
     <link name="gb_fastener_screws_hshcs_m3x5_s_1_solid1_1">
         <inertial>
@@ -533,12 +447,6 @@
                 <color rgba="0.768627 0.886275 0.952941 1" />
             </material>
         </visual>
-        <collision>
-            <origin xyz="0 0 0" rpy="0 -0 0" />
-            <geometry>
-                <mesh filename="package://new_robot/meshes/GB_FASTENER_SCREWS_HSHCS_M3X5_S_1_solid1.stl" scale="1 1 1" />
-            </geometry>
-        </collision>
     </link>
     <link name="gb_fastener_screws_hshcs_m3x5_s_2_solid1">
         <inertial>
@@ -555,12 +463,6 @@
                 <color rgba="0.972549 0.529412 0.00392157 1" />
             </material>
         </visual>
-        <collision>
-            <origin xyz="0 0 0" rpy="0 -0 0" />
-            <geometry>
-                <mesh filename="package://new_robot/meshes/GB_FASTENER_SCREWS_HSHCS_M3X5_S_2_solid1.stl" scale="1 1 1" />
-            </geometry>
-        </collision>
     </link>
     <link name="gb_fastener_screws_hshcs_m3x5_s_2_solid1_1">
         <inertial>
@@ -577,12 +479,6 @@
                 <color rgba="0.972549 0.529412 0.00392157 1" />
             </material>
         </visual>
-        <collision>
-            <origin xyz="0 0 0" rpy="0 -0 0" />
-            <geometry>
-                <mesh filename="package://new_robot/meshes/GB_FASTENER_SCREWS_HSHCS_M3X5_S_2_solid1.stl" scale="1 1 1" />
-            </geometry>
-        </collision>
     </link>
     <link name="gb_fastener_screws_hshcs_m3x5_s_4_solid1">
         <inertial>
@@ -599,12 +495,6 @@
                 <color rgba="0.498039 0.498039 0.498039 1" />
             </material>
         </visual>
-        <collision>
-            <origin xyz="0 0 0" rpy="0 -0 0" />
-            <geometry>
-                <mesh filename="package://new_robot/meshes/GB_FASTENER_SCREWS_HSHCS_M3X5_S_4_solid1.stl" scale="1 1 1" />
-            </geometry>
-        </collision>
     </link>
     <link name="gb_fastener_screws_hshcs_m3x5_s_4_solid1_1">
         <inertial>
@@ -621,12 +511,6 @@
                 <color rgba="0.498039 0.498039 0.498039 1" />
             </material>
         </visual>
-        <collision>
-            <origin xyz="0 0 0" rpy="0 -0 0" />
-            <geometry>
-                <mesh filename="package://new_robot/meshes/GB_FASTENER_SCREWS_HSHCS_M3X5_S_4_solid1.stl" scale="1 1 1" />
-            </geometry>
-        </collision>
     </link>
     <link name="gl60_v1_0_240806a_1_solid86">
         <inertial>
@@ -643,12 +527,6 @@
                 <color rgba="0.231373 0.380392 0.705882 1" />
             </material>
         </visual>
-        <collision>
-            <origin xyz="0 0 0" rpy="0 -0 0" />
-            <geometry>
-                <mesh filename="package://new_robot/meshes/GL60_V1_0_240806A_1_solid86.stl" scale="1 1 1" />
-            </geometry>
-        </collision>
     </link>
     <link name="gl60_v1_0_240806a_1_solid86_1">
         <inertial>
@@ -665,12 +543,6 @@
                 <color rgba="0.231373 0.380392 0.705882 1" />
             </material>
         </visual>
-        <collision>
-            <origin xyz="0 0 0" rpy="0 -0 0" />
-            <geometry>
-                <mesh filename="package://new_robot/meshes/GL60_V1_0_240806A_1_solid86.stl" scale="1 1 1" />
-            </geometry>
-        </collision>
     </link>
     <link name="gl60_v1_0_240806a_1_solid87">
         <inertial>
@@ -687,12 +559,6 @@
                 <color rgba="0.917647 0.917647 0.917647 1" />
             </material>
         </visual>
-        <collision>
-            <origin xyz="0 0 0" rpy="0 -0 0" />
-            <geometry>
-                <mesh filename="package://new_robot/meshes/GL60_V1_0_240806A_1_solid87.stl" scale="1 1 1" />
-            </geometry>
-        </collision>
     </link>
     <link name="gl60_v1_0_240806a_1_solid87_1">
         <inertial>
@@ -709,12 +575,6 @@
                 <color rgba="0.917647 0.917647 0.917647 1" />
             </material>
         </visual>
-        <collision>
-            <origin xyz="0 0 0" rpy="0 -0 0" />
-            <geometry>
-                <mesh filename="package://new_robot/meshes/GL60_V1_0_240806A_1_solid87.stl" scale="1 1 1" />
-            </geometry>
-        </collision>
     </link>
     <link name="m3_ÂÝÎÆ__1">
         <inertial>
@@ -731,12 +591,6 @@
                 <color rgba="0.615686 0.811765 0.929412 1" />
             </material>
         </visual>
-        <collision>
-            <origin xyz="0 0 0" rpy="0 -0 0" />
-            <geometry>
-                <mesh filename="package://new_robot/meshes/M3_______1.stl" scale="1 1 1" />
-            </geometry>
-        </collision>
     </link>
     <link name="m3_ÂÝÎÆ__1_1">
         <inertial>
@@ -753,12 +607,6 @@
                 <color rgba="0.615686 0.811765 0.929412 1" />
             </material>
         </visual>
-        <collision>
-            <origin xyz="0 0 0" rpy="0 -0 0" />
-            <geometry>
-                <mesh filename="package://new_robot/meshes/M3_______1.stl" scale="1 1 1" />
-            </geometry>
-        </collision>
     </link>
     <link name="none">
         <inertial>
@@ -775,12 +623,6 @@
                 <color rgba="0.980392 0.713726 0.00392157 1" />
             </material>
         </visual>
-        <collision>
-            <origin xyz="0 0 0" rpy="0 -0 0" />
-            <geometry>
-                <mesh filename="package://new_robot/meshes/NONE.stl" scale="1 1 1" />
-            </geometry>
-        </collision>
     </link>
     <link name="none_1">
         <inertial>
@@ -794,12 +636,6 @@
                 <mesh filename="package://new_robot/meshes/NONE_1.stl" scale="1 1 1" />
             </geometry>
         </visual>
-        <collision>
-            <origin xyz="0 0 0" rpy="0 -0 0" />
-            <geometry>
-                <mesh filename="package://new_robot/meshes/NONE_1.stl" scale="1 1 1" />
-            </geometry>
-        </collision>
     </link>
     <link name="none_2">
         <inertial>
@@ -816,12 +652,6 @@
                 <color rgba="0.980392 0.713726 0.00392157 1" />
             </material>
         </visual>
-        <collision>
-            <origin xyz="0 0 0" rpy="0 -0 0" />
-            <geometry>
-                <mesh filename="package://new_robot/meshes/NONE.stl" scale="1 1 1" />
-            </geometry>
-        </collision>
     </link>
     <link name="none_3">
         <inertial>
@@ -835,12 +665,6 @@
                 <mesh filename="package://new_robot/meshes/NONE_1.stl" scale="1 1 1" />
             </geometry>
         </visual>
-        <collision>
-            <origin xyz="0 0 0" rpy="0 -0 0" />
-            <geometry>
-                <mesh filename="package://new_robot/meshes/NONE_1.stl" scale="1 1 1" />
-            </geometry>
-        </collision>
     </link>
     <link name="none__1_">
         <inertial>
@@ -885,12 +709,6 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
-        <collision>
-            <origin xyz="0.00165 -0.00127877 0" rpy="0 -0 0" />
-            <geometry>
-                <mesh filename="package://new_robot/meshes/Part_1.stl" scale="1 1 1" />
-            </geometry>
-        </collision>
     </link>
     <link name="part_1_1">
         <inertial>
@@ -912,6 +730,22 @@
             <geometry>
                 <cylinder radius="0.105" length="0.07" />
             </geometry>
+            <surface>
+                <contact>
+                    <ode>
+                        <kp>1e5</kp>
+                        <kd>10</kd>
+                        <max_vel>0.1</max_vel>
+                        <min_depth>0.001</min_depth>
+                    </ode>
+                </contact>
+                <friction>
+                    <ode>
+                        <mu>0.8</mu>
+                        <mu2>0.8</mu2>
+                    </ode>
+                </friction>
+            </surface>
         </collision>
     </link>
     <link name="part_1_10">
@@ -929,12 +763,6 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
-        <collision>
-            <origin xyz="0.00165 -0.00127877 0" rpy="0 -0 0" />
-            <geometry>
-                <mesh filename="package://new_robot/meshes/Part_1.stl" scale="1 1 1" />
-            </geometry>
-        </collision>
     </link>
     <link name="part_1_11">
         <inertial>
@@ -951,12 +779,6 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
-        <collision>
-            <origin xyz="0.00165 -0.00127877 0" rpy="0 -0 0" />
-            <geometry>
-                <mesh filename="package://new_robot/meshes/Part_1.stl" scale="1 1 1" />
-            </geometry>
-        </collision>
     </link>
     <link name="part_1_12">
         <inertial>
@@ -978,6 +800,22 @@
             <geometry>
                 <cylinder radius="0.105" length="0.07" />
             </geometry>
+            <surface>
+                <contact>
+                    <ode>
+                        <kp>1e5</kp>
+                        <kd>10</kd>
+                        <max_vel>0.1</max_vel>
+                        <min_depth>0.001</min_depth>
+                    </ode>
+                </contact>
+                <friction>
+                    <ode>
+                        <mu>0.8</mu>
+                        <mu2>0.8</mu2>
+                    </ode>
+                </friction>
+            </surface>
         </collision>
     </link>
     <link name="part_1_13">
@@ -1000,6 +838,22 @@
             <geometry>
                 <cylinder radius="0.105" length="0.07" />
             </geometry>
+            <surface>
+                <contact>
+                    <ode>
+                        <kp>1e5</kp>
+                        <kd>10</kd>
+                        <max_vel>0.1</max_vel>
+                        <min_depth>0.001</min_depth>
+                    </ode>
+                </contact>
+                <friction>
+                    <ode>
+                        <mu>0.8</mu>
+                        <mu2>0.8</mu2>
+                    </ode>
+                </friction>
+            </surface>
         </collision>
     </link>
     <link name="part_1_14">
@@ -1017,12 +871,6 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
-        <collision>
-            <origin xyz="0.00165 -0.00127877 0.052" rpy="0 -0 0" />
-            <geometry>
-                <mesh filename="package://new_robot/meshes/Part_1.stl" scale="1 1 1" />
-            </geometry>
-        </collision>
     </link>
     <link name="part_1_15">
         <inertial>
@@ -1039,12 +887,6 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
-        <collision>
-            <origin xyz="0.01309 -0.0207788 0" rpy="0 -0 0" />
-            <geometry>
-                <mesh filename="package://new_robot/meshes/Part_1.stl" scale="1 1 1" />
-            </geometry>
-        </collision>
     </link>
     <link name="part_1_16">
         <inertial>
@@ -1061,12 +903,6 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
-        <collision>
-            <origin xyz="0.00165 -0.00127877 0.052" rpy="0 -0 0" />
-            <geometry>
-                <mesh filename="package://new_robot/meshes/Part_1.stl" scale="1 1 1" />
-            </geometry>
-        </collision>
     </link>
     <link name="part_1_17">
         <inertial>
@@ -1083,12 +919,6 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
-        <collision>
-            <origin xyz="0.00165 0.00522123 -9.02056e-18" rpy="0 -0 0" />
-            <geometry>
-                <mesh filename="package://new_robot/meshes/Part_1.stl" scale="1 1 1" />
-            </geometry>
-        </collision>
     </link>
     <link name="part_1_18">
         <inertial>
@@ -1105,12 +935,6 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
-        <collision>
-            <origin xyz="0.00165 -0.00127877 0.052" rpy="0 -0 0" />
-            <geometry>
-                <mesh filename="package://new_robot/meshes/Part_1.stl" scale="1 1 1" />
-            </geometry>
-        </collision>
     </link>
     <link name="part_1_19">
         <inertial>
@@ -1127,12 +951,6 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
-        <collision>
-            <origin xyz="0.00165 -0.00127877 0" rpy="0 -0 0" />
-            <geometry>
-                <mesh filename="package://new_robot/meshes/Part_1.stl" scale="1 1 1" />
-            </geometry>
-        </collision>
     </link>
     <link name="part_1_2">
         <inertial>
@@ -1149,12 +967,6 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
-        <collision>
-            <origin xyz="0.01309 0.0182212 0.052" rpy="0 -0 0" />
-            <geometry>
-                <mesh filename="package://new_robot/meshes/Part_1.stl" scale="1 1 1" />
-            </geometry>
-        </collision>
     </link>
     <link name="part_1_3">
         <inertial>
@@ -1171,12 +983,6 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
-        <collision>
-            <origin xyz="-0.01785 0.0101612 0.052" rpy="0 -0 0" />
-            <geometry>
-                <mesh filename="package://new_robot/meshes/Part_1.stl" scale="1 1 1" />
-            </geometry>
-        </collision>
     </link>
     <link name="part_1_4">
         <inertial>
@@ -1193,12 +999,6 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
-        <collision>
-            <origin xyz="-0.00979 0.0182212 0" rpy="0 -0 0" />
-            <geometry>
-                <mesh filename="package://new_robot/meshes/Part_1.stl" scale="1 1 1" />
-            </geometry>
-        </collision>
     </link>
     <link name="part_1_5">
         <inertial>
@@ -1215,12 +1015,6 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
-        <collision>
-            <origin xyz="0.00165 -0.00127877 0" rpy="0 -0 0" />
-            <geometry>
-                <mesh filename="package://new_robot/meshes/Part_1.stl" scale="1 1 1" />
-            </geometry>
-        </collision>
     </link>
     <link name="part_1_6">
         <inertial>
@@ -1237,12 +1031,6 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
-        <collision>
-            <origin xyz="0.00165 -0.00127877 0.052" rpy="0 -0 0" />
-            <geometry>
-                <mesh filename="package://new_robot/meshes/Part_1.stl" scale="1 1 1" />
-            </geometry>
-        </collision>
     </link>
     <link name="part_1_7">
         <inertial>
@@ -1259,12 +1047,6 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
-        <collision>
-            <origin xyz="0.00165 -0.00127877 0" rpy="0 -0 0" />
-            <geometry>
-                <mesh filename="package://new_robot/meshes/Part_1.stl" scale="1 1 1" />
-            </geometry>
-        </collision>
     </link>
     <link name="part_1_8">
         <inertial>
@@ -1281,12 +1063,6 @@
                 <color rgba="0.898039 0.898039 0.898039 1" />
             </material>
         </visual>
-        <collision>
-            <origin xyz="0.00165 -0.00127877 0.052" rpy="0 -0 0" />
-            <geometry>
-                <mesh filename="package://new_robot/meshes/Part_1.stl" scale="1 1 1" />
-            </geometry>
-        </collision>
     </link>
 
     <link name="part_1_9">
@@ -1309,6 +1085,22 @@
             <geometry>
                 <cylinder radius="0.105" length="0.07" />
             </geometry>
+            <surface>
+                <contact>
+                    <ode>
+                        <kp>1e5</kp>
+                        <kd>10</kd>
+                        <max_vel>0.1</max_vel>
+                        <min_depth>0.001</min_depth>
+                    </ode>
+                </contact>
+                <friction>
+                    <ode>
+                        <mu>0.8</mu>
+                        <mu2>0.8</mu2>
+                    </ode>
+                </friction>
+            </surface>
         </collision>
     </link>
     <link name="root" />
@@ -1327,12 +1119,6 @@
                 <color rgba="0.839216 0.839216 0.917647 1" />
             </material>
         </visual>
-        <collision>
-            <origin xyz="-0.0873916 -2.63602e-18 0" rpy="0 -0 0" />
-            <geometry>
-                <mesh filename="package://new_robot/meshes/_____________.stl" scale="1 1 1" />
-            </geometry>
-        </collision>
     </link>
     <link name="Колісний_диск_1">
         <inertial>
@@ -1349,12 +1135,6 @@
                 <color rgba="0.839216 0.839216 0.917647 1" />
             </material>
         </visual>
-        <collision>
-            <origin xyz="-0.0873916 -2.63602e-18 0" rpy="0 -0 0" />
-            <geometry>
-                <mesh filename="package://new_robot/meshes/_____________.stl" scale="1 1 1" />
-            </geometry>
-        </collision>
     </link>
     <link name="Колісний_диск_2">
         <inertial>
@@ -1371,12 +1151,6 @@
                 <color rgba="0.839216 0.839216 0.917647 1" />
             </material>
         </visual>
-        <collision>
-            <origin xyz="-0.0891082 -2.95136e-18 0" rpy="0 -0 0" />
-            <geometry>
-                <mesh filename="package://new_robot/meshes/_____________.stl" scale="1 1 1" />
-            </geometry>
-        </collision>
     </link>
     <link name="Колісний_диск_3">
         <inertial>
@@ -1393,12 +1167,6 @@
                 <color rgba="0.839216 0.839216 0.917647 1" />
             </material>
         </visual>
-        <collision>
-            <origin xyz="-0.0870082 -2.5656e-18 0" rpy="0 -0 0" />
-            <geometry>
-                <mesh filename="package://new_robot/meshes/_____________.stl" scale="1 1 1" />
-            </geometry>
-        </collision>
     </link>
     <link name="Шина700">
         <inertial>
@@ -1415,12 +1183,6 @@
                 <color rgba="0.298039 0.298039 0.298039 1" />
             </material>
         </visual>
-        <collision>
-            <origin xyz="0 0 0" rpy="0 -0 0" />
-            <geometry>
-                <mesh filename="package://new_robot/meshes/____700.stl" scale="1 1 1" />
-            </geometry>
-        </collision>
     </link>
     <link name="Шина700_1">
         <inertial>
@@ -1437,12 +1199,6 @@
                 <color rgba="0.298039 0.298039 0.298039 1" />
             </material>
         </visual>
-        <collision>
-            <origin xyz="0 0 0" rpy="0 -0 0" />
-            <geometry>
-                <mesh filename="package://new_robot/meshes/____700.stl" scale="1 1 1" />
-            </geometry>
-        </collision>
     </link>
     <link name="Шина700_2">
         <inertial>
@@ -1459,12 +1215,6 @@
                 <color rgba="0.298039 0.298039 0.298039 1" />
             </material>
         </visual>
-        <collision>
-            <origin xyz="0 0 0" rpy="0 -0 0" />
-            <geometry>
-                <mesh filename="package://new_robot/meshes/____700.stl" scale="1 1 1" />
-            </geometry>
-        </collision>
     </link>
     <link name="Шина700_3">
         <inertial>
@@ -1481,12 +1231,6 @@
                 <color rgba="0.298039 0.298039 0.298039 1" />
             </material>
         </visual>
-        <collision>
-            <origin xyz="0 0 0" rpy="0 -0 0" />
-            <geometry>
-                <mesh filename="package://new_robot/meshes/____700.stl" scale="1 1 1" />
-            </geometry>
-        </collision>
     </link>
     <joint name="fastened_1" type="fixed">
         <origin xyz="5.55112e-17 0.036 -1.38778e-17" rpy="3.14159 -1.00614e-16 -1.44756e-15" />
@@ -1920,12 +1664,6 @@
                 <color rgba="0.2 0.5 0.9 1" />
             </material>
         </visual>
-        <collision>
-            <origin xyz="0 0 0" rpy="0 0 0" />
-            <geometry>
-                <mesh filename="package://new_robot/meshes/water_tank.stl" scale="1 1 1" />
-            </geometry>
-        </collision>
     </link>
 
 <!-- 수정 후 -->
