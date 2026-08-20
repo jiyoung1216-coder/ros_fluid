@@ -467,11 +467,20 @@ class GimbalLevelingController(Node):
             pitch_slosh_corr_rad = 0.0
 
         slosh_roll_deg = max(-SLOSH_MAX_DEG, min(SLOSH_MAX_DEG,
-                             gate * K_SLOSH * math.degrees(roll_slosh_corr_rad)))
+                             K_SLOSH * math.degrees(roll_slosh_corr_rad)))
         slosh_pitch_deg = max(-SLOSH_MAX_DEG, min(SLOSH_MAX_DEG,
-                              gate * K_SLOSH * math.degrees(pitch_slosh_corr_rad)))
+                              K_SLOSH * math.degrees(pitch_slosh_corr_rad)))
         target_roll_deg += slosh_roll_deg
         target_pitch_deg += slosh_pitch_deg
+
+        # 게이트를 전체 보정(베이스 레벨링 + trim + 슬로싱)에 한 번에 적용한다.
+        # 정지/잔잔한 상태(gate≈0)에서는 베이스 필터나 trim에 남아있는 잔여
+        # 오차/드리프트가 있어도 최종 목표각은 0(수평)으로 수렴하고, 실제
+        # 주행/외란이 감지되면(gate≈1) 전체 보정 로직이 원래대로 작동한다.
+        # "평소엔 최대한 수평 유지, 필요할 때만 짐벌이 움직인다"는 요구사항을
+        # 여기서 구현한다.
+        target_roll_deg *= gate
+        target_pitch_deg *= gate
 
         # 최종 출력: degree -> radian, 조인트 리밋 클램프 후 출력단 저역통과 필터
         roll_cmd_raw = max(-JOINT_LIMIT_RAD, min(JOINT_LIMIT_RAD, math.radians(target_roll_deg)))
@@ -487,6 +496,8 @@ class GimbalLevelingController(Node):
 
         # 디버그: roll 쪽 각 단계 값을 분리해서 확인 (원인 파악용, 끝나면 지울 것)
         self.get_logger().info(
+            f"gate={gate:.2f} cmd_lin={self._latest_cmd_lin:.2f} cmd_ang={self._latest_cmd_ang:.2f} "
+            f"gyro_deg={gyro_deg:.2f} acc_mag={acc_mag:.2f} "
             f"roll_filtered={self.roll_filtered:.2f}deg "
             f"internal_roll={self.internal_roll:.2f}deg "
             f"shaped_roll={shaped_roll:.2f}deg "
