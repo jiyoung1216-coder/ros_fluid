@@ -1,0 +1,45 @@
+<?xml version="1.0" ?>
+<sdf version="1.9">
+  <model name="ramp_bridge">
+    <static>true</static>
+    <link name="ramp_link">
+      <!-- 삼각기둥을 눕힌 형태(밑변이 옆면) — 로컬 X/Y 평면의 삼각형을
+           로컬 Z축으로 폭(width)만큼 압출한 뒤, roll=90/yaw=90 회전으로
+           로컬 X->월드 Y(오르막/내리막 방향), 로컬 Y->월드 Z(높이),
+           로컬 Z->월드 X(다리 폭 방향)이 되도록 배치한다. -->
+      <pose>0 0 0 1.5708 0 1.5708</pose>
+      <collision name="ramp_collision">
+        <geometry>
+          <polyline>
+            <point>-6.0 0</point>
+            <point>6.0 0</point>
+            <point>0 3.4641</point>
+            <height>12.5</height>
+          </polyline>
+        </geometry>
+        <surface>
+          <friction>
+            <ode>
+              <mu>0.9</mu>
+              <mu2>0.9</mu2>
+            </ode>
+          </friction>
+        </surface>
+      </collision>
+      <visual name="ramp_visual">
+        <geometry>
+          <polyline>
+            <point>-6.0 0</point>
+            <point>6.0 0</point>
+            <point>0 3.4641</point>
+            <height>12.5</height>
+          </polyline>
+        </geometry>
+        <material>
+          <ambient>0.55 0.55 0.58 1</ambient>
+          <diffuse>0.62 0.62 0.65 1</diffuse>
+        </material>
+      </visual>
+    </link>
+  </model>
+</sdf>

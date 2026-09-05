@@ -12,23 +12,41 @@
             <topic>cmd_vel</topic>
             <frame_id>odom</frame_id>
             <child_frame_id>root</child_frame_id>
+            <max_linear_acceleration>1.0</max_linear_acceleration>
+            <min_linear_acceleration>-1.0</min_linear_acceleration>
+            <max_angular_acceleration>2.0</max_angular_acceleration>
+            <min_angular_acceleration>-2.0</min_angular_acceleration>
         </plugin>
+            <!-- p_gain/d_gain — motor_test_MIT.ino의 MOTOR_KP=1.0/MOTOR_KD=0.05를
+                 그대로 쓰면(i_gain=0, P전용) 여기 CAD 트레이+짐벌 조립체의
+                 중력 토크를 못 버텨서 정지 상태에서도 조인트가 한계(±25도)
+                 까지 처져버렸다(2026-08-31 실측 확인). 실제 모터 값은 실물
+                 하드웨어의 실제 부하로 튜닝된 값이라 sim의 (CAD 근사)
+                 질량/무게중심이 다르면 그대로 못 쓴다 — i_gain을 넣어
+                 봤더니 이번엔 진동(오버슈트)해서, 대신 p_gain만 올려
+                 중력을 버틸 강성을 확보했다. d_gain은 p 대비 원래 비율
+                 (0.05)을 유지. p=20,d=1.5였던 이전 임의값보다는 훨씬
+                 부드럽다. -->
             <plugin filename="gz-sim-joint-position-controller-system" name="gz::sim::systems::JointPositionController">
             <joint_name>revolute_1</joint_name>
             <topic>/gimbal_roll_cmd</topic>
-            <p_gain>20</p_gain>
+            <p_gain>15.0</p_gain>
             <i_gain>0</i_gain>
-            <d_gain>15</d_gain>
+            <d_gain>0.75</d_gain>
         </plugin>
             <plugin filename="gz-sim-joint-position-controller-system" name="gz::sim::systems::JointPositionController">
             <joint_name>revolute_2</joint_name>
             <topic>/gimbal_pitch_cmd</topic>
-            <p_gain>20</p_gain>
+            <p_gain>15.0</p_gain>
             <i_gain>0</i_gain>
-            <d_gain>15</d_gain>
+            <d_gain>0.75</d_gain>
         </plugin>
 
         <plugin filename="gz-sim-imu-system" name="gz::sim::systems::Imu"></plugin>
+
+        <plugin filename="gz-sim-joint-state-publisher-system"
+                name="gz::sim::systems::JointStatePublisher">
+        </plugin>
 
         <plugin filename="gz-sim-pose-publisher-system" name="gz::sim::systems::PosePublisher">
             <publish_link_pose>true</publish_link_pose>
@@ -146,6 +164,22 @@
             <geometry>
                 <box size="0.1 0.1 0.06" />
             </geometry>
+            <surface>
+                <contact>
+                    <ode>
+                        <kp>1e5</kp>
+                        <kd>10</kd>
+                        <max_vel>0.1</max_vel>
+                        <min_depth>0.001</min_depth>
+                    </ode>
+                </contact>
+                <friction>
+                    <ode>
+                        <mu>0.8</mu>
+                        <mu2>0.8</mu2>
+                    </ode>
+                </friction>
+            </surface>
         </collision>
 </link>
     <link name="body2_2">
@@ -168,6 +202,22 @@
             <geometry>
                 <box size="0.1 0.1 0.06" />
             </geometry>
+            <surface>
+                <contact>
+                    <ode>
+                        <kp>1e5</kp>
+                        <kd>10</kd>
+                        <max_vel>0.1</max_vel>
+                        <min_depth>0.001</min_depth>
+                    </ode>
+                </contact>
+                <friction>
+                    <ode>
+                        <mu>0.8</mu>
+                        <mu2>0.8</mu2>
+                    </ode>
+                </friction>
+            </surface>
         </collision>
 </link>
     <link name="body2_3">
@@ -190,7 +240,24 @@
             <geometry>
                 <box size="0.1 0.1 0.06" />
             </geometry>
+            <surface>
+                <contact>
+                    <ode>
+                        <kp>1e5</kp>
+                        <kd>10</kd>
+                        <max_vel>0.1</max_vel>
+                        <min_depth>0.001</min_depth>
+                    </ode>
+                </contact>
+                <friction>
+                    <ode>
+                        <mu>0.8</mu>
+                        <mu2>0.8</mu2>
+                    </ode>
+                </friction>
+            </surface>
         </collision>
+
 </link>
     <link name="default">
         <inertial>
@@ -734,7 +801,7 @@
                 <contact>
                     <ode>
                         <kp>1e5</kp>
-                        <kd>10</kd>
+                        <kd>50</kd>
                         <max_vel>0.1</max_vel>
                         <min_depth>0.001</min_depth>
                     </ode>
@@ -804,7 +871,7 @@
                 <contact>
                     <ode>
                         <kp>1e5</kp>
-                        <kd>10</kd>
+                        <kd>50</kd>
                         <max_vel>0.1</max_vel>
                         <min_depth>0.001</min_depth>
                     </ode>
@@ -842,7 +909,7 @@
                 <contact>
                     <ode>
                         <kp>1e5</kp>
-                        <kd>10</kd>
+                        <kd>50</kd>
                         <max_vel>0.1</max_vel>
                         <min_depth>0.001</min_depth>
                     </ode>
@@ -1089,7 +1156,7 @@
                 <contact>
                     <ode>
                         <kp>1e5</kp>
-                        <kd>10</kd>
+                        <kd>50</kd>
                         <max_vel>0.1</max_vel>
                         <min_depth>0.001</min_depth>
                     </ode>
@@ -1585,7 +1652,7 @@
         <axis xyz="-0 -0 -1" />
         <parent link="m3_ÂÝÎÆ__1" />
         <child link="default_4" />
-        <limit lower="-0.4363" upper="0.4363" effort="10" velocity="3.0" />
+        <limit lower="-0.4363" upper="0.4363" effort="2.5" velocity="3.0" />
         <dynamics damping="0.2" friction="0.05" />
     </joint>
     <joint name="revolute_2" type="revolute">
@@ -1593,7 +1660,7 @@
         <axis xyz="-0 1 -0" />
         <parent link="m3_ÂÝÎÆ__1_1" />
         <child link="default_7" />
-        <limit lower="-0.4363" upper="0.4363" effort="10" velocity="3.0" />
+        <limit lower="-0.4363" upper="0.4363" effort="2.5" velocity="3.0" />
         <dynamics damping="0.2" friction="0.05" />
     </joint>
     <joint name="revolute_3" type="continuous">
@@ -1650,10 +1717,13 @@
         <child link="Шина700_3" />
     </joint>
     <link name="water_tank">
+        <!-- 질량 = 고정 질량 m0(0.6899kg, Housner 등가모델). 슬로싱 질량 m1(0.1654kg)은
+             slosh_bob 링크로 분리했으므로 여기 중복 포함하지 않는다. 관성은 원래
+             0.5kg 기준값을 질량비(0.6899/0.5)로 스케일링. -->
         <inertial>
-            <mass value="0.5" />
+            <mass value="0.6899" />
             <origin xyz="0 0 0" rpy="0 0 0" />
-            <inertia ixx="0.0018" iyy="0.0018" izz="0.0009" ixy="0" ixz="0" iyz="0" />
+            <inertia ixx="0.002484" iyy="0.002484" izz="0.001242" ixy="0" ixz="0" iyz="0" />
         </inertial>
         <visual>
             <origin xyz="0 0 0" rpy="0 0 0" />
@@ -1671,5 +1741,47 @@
         <origin xyz="-0.115419 0.019334 0.169057" rpy="0.000498 1.545365 3.080375" />
         <parent link="default_4" />
         <child link="water_tank" />
+    </joint>
+
+    <!-- ===== Housner 등가 슬로싱 진자 (sim_control/가제보_환경_수정요청.md 참조) =====
+         R=55mm, h=90mm 기준. spherical 조인트가 없으므로 직교 revolute 2개로 유니버설을
+         만든다. slosh_pendulum_x/y 각도가 슬로싱 지표(analyze_log.py의 slosh_x/y_deg). -->
+    <link name="slosh_gimbal_x">
+        <inertial>
+            <mass value="0.005" />
+            <origin xyz="0 0 0" rpy="0 0 0" />
+            <inertia ixx="1e-6" ixy="0" ixz="0" iyy="1e-6" iyz="0" izz="1e-6" />
+        </inertial>
+    </link>
+
+    <link name="slosh_bob">
+        <inertial>
+            <mass value="0.1654" />
+            <origin xyz="0 0 0" rpy="0 0 0" />
+            <inertia ixx="2.65e-5" ixy="0" ixz="0" iyy="2.65e-5" iyz="0" izz="2.65e-5" />
+        </inertial>
+        <visual>
+            <origin xyz="0 0 0" rpy="0 0 0" />
+            <geometry><sphere radius="0.012" /></geometry>
+            <material name="slosh_blue"><color rgba="0.2 0.6 1.0 0.8" /></material>
+        </visual>
+    </link>
+
+    <joint name="slosh_pendulum_x" type="revolute">
+        <origin xyz="0 0 0.00294" rpy="0 0 0" />
+        <axis xyz="1 0 0" />
+        <parent link="water_tank" />
+        <child link="slosh_gimbal_x" />
+        <limit lower="-0.6" upper="0.6" effort="1.0" velocity="20.0" />
+        <dynamics damping="5.39e-5" friction="0.0" />
+    </joint>
+
+    <joint name="slosh_pendulum_y" type="revolute">
+        <origin xyz="0 0 -0.03002" rpy="0 0 0" />
+        <axis xyz="0 1 0" />
+        <parent link="slosh_gimbal_x" />
+        <child link="slosh_bob" />
+        <limit lower="-0.6" upper="0.6" effort="1.0" velocity="20.0" />
+        <dynamics damping="5.39e-5" friction="0.0" />
     </joint>
 </robot>

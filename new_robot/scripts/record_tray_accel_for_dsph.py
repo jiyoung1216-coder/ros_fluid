@@ -42,7 +42,6 @@ record_tray_accel_for_dsph.py
     (기본 출력: new_robot_accel.csv)
 """
 
-import math
 import sys
 
 import rclpy
@@ -55,23 +54,19 @@ GRAVITY_VEC = (0.0, 0.0, -GRAVITY)
 TRAY_IMU_TOPIC = "/imu_tray"
 DEFAULT_OUTPUT_PATH = "new_robot_accel.csv"
 
-
-def quat_to_matrix(x, y, z, w):
-    n = math.sqrt(x * x + y * y + z * z + w * w)
-    x, y, z, w = x / n, y / n, z / n, w / n
-    return (
-        (1 - 2 * (y * y + z * z), 2 * (x * y - z * w),     2 * (x * z + y * w)),
-        (2 * (x * y + z * w),     1 - 2 * (x * x + z * z), 2 * (y * z - x * w)),
-        (2 * (x * z - y * w),     2 * (y * z + x * w),     1 - 2 * (x * x + y * y)),
-    )
+# /imu_tray의 orientation 필드는 정지 상태에서도 identity를 보고하는 반면
+# linear_acceleration은 중력이 X축에 실려서 나온다(장착 정렬이 안 된 센서 -
+# gimbal_leveling_controller.py의 cad_rotated_tray와 동일한 문제). orientation을
+# 믿고 회전시키면 정지 상태에서도 0 근처가 아니라 거의 중력 크기만큼 남는
+# 버그가 있었다. 대신 이미 검증된 cad_rotated_tray 고정 축 리맵을 그대로 쓴다.
+# (spec = ((축인덱스, 부호), ...) for x,y,z)
+CAD_ROTATED_TRAY = ((1, 1.0), (2, -1.0), (0, -1.0))
 
 
-def mat_vec_mul(R, v):
-    return (
-        R[0][0] * v[0] + R[0][1] * v[1] + R[0][2] * v[2],
-        R[1][0] * v[0] + R[1][1] * v[1] + R[1][2] * v[2],
-        R[2][0] * v[0] + R[2][1] * v[1] + R[2][2] * v[2],
-    )
+def remap3(v, spec):
+    return (spec[0][1] * v[spec[0][0]],
+            spec[1][1] * v[spec[1][0]],
+            spec[2][1] * v[spec[2][0]])
 
 
 class TrayAccelRecorder(Node):
@@ -89,24 +84,25 @@ class TrayAccelRecorder(Node):
             self._t0 = t
         rel_t = t - self._t0
 
-        q = msg.orientation
-        R = quat_to_matrix(q.x, q.y, q.z, q.w)
         a_body = (msg.linear_acceleration.x,
                   msg.linear_acceleration.y,
                   msg.linear_acceleration.z)
-        a_world_specific = mat_vec_mul(R, a_body)
+        a_remap = remap3(a_body, CAD_ROTATED_TRAY)
         a_world = (
-            a_world_specific[0] + GRAVITY_VEC[0],
-            a_world_specific[1] + GRAVITY_VEC[1],
-            a_world_specific[2] + GRAVITY_VEC[2],
+            a_remap[0] + GRAVITY_VEC[0],
+            a_remap[1] + GRAVITY_VEC[1],
+            a_remap[2] + GRAVITY_VEC[2],
         )
 
-        w = msg.angular_velocity  # body frame 그대로 사용
+        w_body = (msg.angular_velocity.x,
+                  msg.angular_velocity.y,
+                  msg.angular_velocity.z)
+        w = remap3(w_body, CAD_ROTATED_TRAY)
 
         self.f.write(
             f"{rel_t:.6f},"
             f"{a_world[0]:.6f},{a_world[1]:.6f},{a_world[2]:.6f},"
-            f"{w.x:.6f},{w.y:.6f},{w.z:.6f}\n"
+            f"{w[0]:.6f},{w[1]:.6f},{w[2]:.6f}\n"
         )
         self._n += 1
         if self._n % 500 == 0:

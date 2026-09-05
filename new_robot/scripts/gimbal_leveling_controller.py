@@ -7,8 +7,21 @@ ROS2(rclpy) + Gazebo Harmonic(gz sim) 시뮬레이션용으로 이식한 노드.
 
 원본과의 차이점 (가제보_연동_확인사항_답변.md 기준):
   - 액추에이터가 이미 위치 컨트롤러(gz-sim-joint-position-controller-system,
-    내부 PID p=25 i=0 d=1.5)이므로, 여기서는 "목표 각도(rad)"만 계산해서
-    /gimbal_roll_cmd, /gimbal_pitch_cmd 로 보낸다.
+    내부 PID p=15.0 i=0 d=0.75)이므로, 여기서는 "목표 각도(rad)"만 계산해서
+    /gimbal_roll_cmd, /gimbal_pitch_cmd로 보낸다. 원래 실제 짐벌 모터
+    motor_test_MIT.ino 값(MOTOR_KP=1.0/MOTOR_KD=0.05)을 그대로 넣었더니
+    sim의 CAD 트레이+짐벌 조립체 무게를 못 버텨서 정지 상태에서도 조인트가
+    한계(±25도)까지 처졌다(2026-08-31 실측). 실제 모터값은 실물 부하 기준
+    튜닝이라 sim 부하가 다르면 그대로 못 씀 — p_gain만 올려 비율(d/p=0.05)은
+    유지한 채 중력을 버틸 강성을 확보했다.
+  - ▶ 추가: motor_test_MIT.ino 상단 경고("MIT 모드는 속도 제한이 없다 — 계단
+    명령 금지")를 반영한 출력단 하드 슬루레이트 리미터(MAX_CMD_RATE_DEG_S).
+    실제 MIT 구동은 τ=Kp*오차 라서 목표각이 한 번에 크게 튀면 그 순간
+    포화토크가 그대로 걸린다. OUTPUT_SMOOTH(지수 저역통과)만으로는 오차가
+    클 때 첫 스텝의 순간 변화율이 이 한도를 넘을 수 있어, 최종 발행 직전에
+    한 번 더 하드 캡을 건다. 상한 150deg/s는 motor_test_MIT.ino의
+    SWEEP_RATE_MAX(시리얼 다이얼인 상한, 2026-08-31 갱신 — 이전 60에서 상향)
+    값을 그대로 가져왔다.
   - 원본 Phase 4(모터 피드백 기반 게인 스케줄링 PID)는 그대로 옮기지 않고,
     tray IMU가 있을 때만 활성화되는 "보정 trim"으로 역할을 바꿨다.
   - orientation 쿼터니언의 "노드 시작 시점 값을 0으로 잡고 상대 회전만 사용"
@@ -36,9 +49,28 @@ ROS2(rclpy) + Gazebo Harmonic(gz sim) 시뮬레이션용으로 이식한 노드.
     임계값 근처에서 흔들릴 때 0으로 순간 점프하는 불연속을 만들고, 이게
     ZV 셰이퍼에 계단 입력을 넣는 것과 같은 효과를 내서 정지 상태에서도
     미세한 촐랑거림의 원인이 됐었다.
+  - ▶ 전면 수정(2026-08-31): 실제 하드웨어 영상으로 확인된 요구 거동(①
+    병진 없이 회전만 하면 반대방향 롤 뱅킹 ② 등속 병진은 수평 ③ 가속/감속
+    병진은 충격 완화 방향으로 기울임 ④ 초기상태 수평)에 맞춰 Phase 2를
+    base IMU 원시가속도 대신 오도메트리(root 프레임) 기반 운동학
+    추정치(v, omega, dv/dt)로 재작성했다. base IMU가 붙은 body2 링크는
+    CAD 임포트 과정에서 생긴 고정 장착 회전 때문에 로컬 축이 REP-103과
+    안 맞아(정지 상태에서도 중력 전체가 로컬 Y축에서 읽힘) 원시가속도
+    기반 보상이 근본적으로 왜곡됐었다 — 오도메트리는 이미 표준 축이라
+    이 문제가 없다.
+  - ▶ 추가(2026-08-31): 차체 자세 레벨링. 위 Phase 2(스핀뱅킹/충격완화)는
+    "움직임"에만 반응해서, 주행 없이 차체 자체가 (지형이든 Gazebo에서
+    수동으로 기울이든) 기울어져 있으면 트레이가 그걸 상쇄하는 기능이
+    없었다. Phase1에서 이미 계산하던 roll_filtered/pitch_filtered(base
+    IMU 상보필터)를 재사용해서 "차체가 기운 만큼 반대로 돌려 항상 월드
+    수평 유지"를 구현했다. gate와 무관하게 항상 켜짐(정지 상태에서도
+    차체가 기울어 있으면 계속 보정해야 하므로).
 
 ⚠️ 반드시 시뮬레이션에서 직접 확인/조정해야 하는 부분
   - "축 부호 설정" 블록의 부호(+-1).
+  - BASE_LEVEL_ROLL_SIGN / BASE_LEVEL_PITCH_SIGN: 차체를 기울였을 때
+    트레이가 반대로 도는 게 맞는지 눈으로 보고 확인. 반대로 돌면(더
+    기울어지면) 해당 부호를 뒤집을 것.
   - KP_MIN_DEG / KP_MAX_DEG: tray IMU 추가 후 재튜닝 필요.
   - K_SLOSH: 물 출렁임 보정 게인. 부호(+-)와 크기 모두 튜닝 필요.
   - OUTPUT_SMOOTH: 낮출수록 부드럽지만 반응이 느려짐. 0.15부터 시작해서 조정.
@@ -46,6 +78,11 @@ ROS2(rclpy) + Gazebo Harmonic(gz sim) 시뮬레이션용으로 이식한 노드.
     실제 로봇 정지 시 센서 노이즈 크기, 주행 시 최소 속도값에 맞춰 조정.
   - SLOSH_DAMPING_RATIO(0.2로 상향)/SLOSH_FORCING_DEADBAND: 슬로싱
     추정기가 노이즈에 링잉하지 않도록 하는 값. 튜닝 필요.
+  - K_SPIN_BANK_DEG_PER_RADS / SPIN_BANK_SIGN: 제자리 회전 시 뱅킹 각도와
+    방향(반대방향이 맞는지 실제로 눈으로 보고 부호 확인). V_FADE_MS는
+    "병진 없음"으로 볼 속도 상한.
+  - ACCEL_EST_ALPHA: 오도메트리 미분 저역통과 계수. 낮추면 부드럽지만
+    가감속 반응이 느려짐.
 """
 
 import math
@@ -53,6 +90,7 @@ import math
 import rclpy
 from rclpy.node import Node
 from geometry_msgs.msg import Twist
+from nav_msgs.msg import Odometry
 from sensor_msgs.msg import Imu
 from std_msgs.msg import Float64
 
@@ -91,6 +129,13 @@ JOINT_LIMIT_RAD = 0.4363  # ±25°
 
 OUTPUT_SMOOTH = 0.05  # 최종 출력 저역통과 필터. 0에 가까울수록 부드럽고 느림
 
+# 실제 짐벌 모터(motor_test_MIT.ino)의 SWEEP_RATE_MAX(시리얼 다이얼인 상한,
+# 2026-08-31 기준 150deg/s). MIT 모드는 자체 속도 제한이 없어(τ=Kp*오차)
+# 목표각을 이보다 빨리 움직이면 실물에서 폭주/기구 튕김 위험이 있다.
+# 시뮬레이션에도 동일 한도를 강제해서, 여기서 검증한 제어상수(ZV, 데드존,
+# 게인 등)가 실물에서도 그대로 안전하게 통하도록 한다.
+MAX_CMD_RATE_DEG_S = 150.0
+
 # ---------------------------------------------------------------------------
 # 축 부호 설정 — 시뮬레이션에서 실제로 기울여보고 검증/조정할 것
 # ---------------------------------------------------------------------------
@@ -99,11 +144,48 @@ GYRO_PITCH_SIGN = 1.0
 ACC_ROLL_SIGN = 1.0
 ACC_PITCH_SIGN = 1.0
 
+# Phase 2(관성 보상)는 base IMU 원시 가속도 대신 오도메트리 기반 운동학
+# 추정치를 쓴다 — chassis_imu가 붙은 body2 링크가 CAD(Onshape) 임포트
+# 과정에서 생긴 고정 장착 회전 때문에 로컬 축이 REP-103(Z-up)과 안 맞아서
+# (정지 상태에서도 중력 9.8 m/s^2 전체가 로컬 Y축에서 읽힘), 원시
+# linear_acceleration을 직접 roll/pitch에 매핑하면 그 장착 회전만큼
+# 왜곡된 값이 나온다. 반면 /model/new_robot/odometry(root 프레임)는
+# 이미 표준 프레임이라 이 문제가 없다.
+V_FADE_MS = 0.15  # 이 속도[m/s] 밑에서는 "병진 없음"으로 보고 스핀뱅킹을 최대로 튼다
+K_SPIN_BANK_DEG_PER_RADS = 15.0  # 제자리 회전 시 반대방향으로 기울이는 세기(deg per rad/s)
+SPIN_BANK_SIGN = 1.0
+ACCEL_EST_ALPHA = 0.15  # 오도메트리 미분(전후 가속도 추정) 저역통과 계수
+
+# 차체 자세 레벨링 — 주행/회전 여부와 무관하게, 차체가 (지형이든 수동
+# 조작이든) 기울어진 만큼 트레이가 반대로 돌아서 항상 월드 바닥과 수평을
+# 유지해야 한다는 요구사항(2026-08-31). Phase1의 roll_filtered/
+# pitch_filtered(base IMU 상보필터, base_q_rel 기반)를 그대로 재사용.
+# gate로 안 묶고 항상 켜둔다 — 정지 상태에서도(등속 주행 중 언덕 경사로
+# 차체가 기운 경우 포함) 차체가 기울어 있으면 계속 보정해야 하니까.
+# BASE_LEVEL_GAIN=1.0은 "측정된 기울기만큼 정확히 반대로" — 부호가
+# 반대로 나오면 *_SIGN을 뒤집을 것.
+#
+# 2026-08-31: body2 링크가 CAD 임포트 과정에서 축이 꼬여있어(정지 상태
+# 에서도 중력 9.8 m/s^2 전체가 로컬 Y축에서 읽힘 — 로컬 Y가 실제
+# 수직축) quat_to_roll_pitch_deg(Z-up 가정)를 그대로 쓰면 90~180도급
+# 오작동이 났다. BASE_LEVEL_FIX_Q로 로컬 프레임을 X축 -90도 회전시켜
+# (standard_X=body2_X, standard_Y=-body2_Z, standard_Z=body2_Y) "로컬
+# Z가 수직"인 표준 프레임으로 바꾼 뒤에 roll/pitch를 뽑는다. 그래도
+# 어느 쪽이 진짜 앞/옆인지, 부호가 맞는지는 실측으로 확인 필요 — 확인
+# 전까지는 GAIN을 낮게, MAX_DEG로 상한을 걸어 혹시 축이 또 틀려도
+# 조인트가 폭주하지 않게 한다.
+BASE_LEVEL_FIX_Q = (-0.70710678, 0.0, 0.0, 0.70710678)  # X축 -90도
+BASE_LEVEL_GAIN = 0.5
+BASE_LEVEL_MAX_DEG = 20.0
+BASE_LEVEL_ROLL_SIGN = 1.0
+BASE_LEVEL_PITCH_SIGN = 1.0
+
 BASE_IMU_TOPIC = "/imu"
 TRAY_IMU_TOPIC = "/imu_tray"
 ROLL_CMD_TOPIC = "/gimbal_roll_cmd"
 PITCH_CMD_TOPIC = "/gimbal_pitch_cmd"
 CMD_VEL_TOPIC = "/cmd_vel"
+ODOM_TOPIC = "/model/new_robot/odometry"
 
 # ---------------------------------------------------------------------------
 # 물 출렁임(Housner) 실시간 추정 관련 상수 — 원본 Control.cpp에는 없음, 추가 레이어
@@ -184,6 +266,21 @@ class SloshEstimator1D:
         return self.xi / self.h1  # 등가 보정각 (rad)
 
 
+def slew_limit(target: float, prev: float, max_delta: float) -> float:
+    """prev에서 target 방향으로 한 스텝에 max_delta 이상 못 움직이게 자른다.
+
+    motor_test_MIT.ino의 `target += dir * step` 램핑(계단 명령 금지)을
+    그대로 이식한 하드 리미터. 지수 저역통과(OUTPUT_SMOOTH)는 오차가 클 때
+    첫 스텝의 순간 변화율을 못 막지만, 이건 물리적으로 절대 못 넘는다.
+    """
+    delta = target - prev
+    if delta > max_delta:
+        delta = max_delta
+    elif delta < -max_delta:
+        delta = -max_delta
+    return prev + delta
+
+
 def apply_deadband(value: float, threshold: float) -> float:
     """threshold 이하는 0, 그 이상은 끊김 없이 통과시키는 연속 데드밴드.
 
@@ -227,23 +324,6 @@ def quat_to_roll_pitch_deg(q):
     pitch = math.asin(sinp)
 
     return math.degrees(roll), math.degrees(pitch)
-
-def quat_to_matrix(q):
-    x, y, z, w = q
-    return (
-        (1 - 2 * (y * y + z * z), 2 * (x * y - z * w),     2 * (x * z + y * w)),
-        (2 * (x * y + z * w),     1 - 2 * (x * x + z * z), 2 * (y * z - x * w)),
-        (2 * (x * z - y * w),     2 * (y * z + x * w),     1 - 2 * (x * x + y * y)),
-    )
-
-
-def mat_transpose_vec_mul(R, v):
-    """R^T @ v"""
-    return (
-        R[0][0] * v[0] + R[1][0] * v[1] + R[2][0] * v[2],
-        R[0][1] * v[0] + R[1][1] * v[1] + R[2][1] * v[2],
-        R[0][2] * v[0] + R[1][2] * v[1] + R[2][2] * v[2],
-    )
 
 
 class ConvolvedZV:
@@ -310,6 +390,7 @@ class GimbalLevelingController(Node):
         self.base_sub = self.create_subscription(Imu, BASE_IMU_TOPIC, self._on_base_imu, 50)
         self.tray_sub = self.create_subscription(Imu, TRAY_IMU_TOPIC, self._on_tray_imu, 50)
         self.cmd_sub = self.create_subscription(Twist, CMD_VEL_TOPIC, self._on_cmd_vel, 10)
+        self.odom_sub = self.create_subscription(Odometry, ODOM_TOPIC, self._on_odom, 10)
 
         self.roll_pub = self.create_publisher(Float64, ROLL_CMD_TOPIC, 10)
         self.pitch_pub = self.create_publisher(Float64, PITCH_CMD_TOPIC, 10)
@@ -323,6 +404,13 @@ class GimbalLevelingController(Node):
         self._latest_cmd_ang = 0.0
         self.activity_gate = ActivityGate()
         self._start_time = self.get_clock().now()
+
+        # 오도메트리(root 프레임) 기반 운동 상태 — Phase 2 관성보상의 입력
+        self._odom_v = 0.0
+        self._odom_omega = 0.0
+        self._odom_seen = False
+        self._prev_odom_v = 0.0
+        self._accel_fwd_filt = 0.0
 
         # Phase 1 상태
         self.pitch_filtered = 0.0
@@ -340,6 +428,10 @@ class GimbalLevelingController(Node):
         # 출력단 저역통과 필터 상태
         self.roll_cmd_filtered = 0.0
         self.pitch_cmd_filtered = 0.0
+
+        # 출력단 하드 슬루레이트 리미터 상태 (실제로 발행되는 최종값)
+        self.roll_cmd_out = 0.0
+        self.pitch_cmd_out = 0.0
 
         # 물 출렁임 실시간 추정
         self._tray_accel0 = None
@@ -361,6 +453,11 @@ class GimbalLevelingController(Node):
     def _on_cmd_vel(self, msg: Twist):
         self._latest_cmd_lin = msg.linear.x
         self._latest_cmd_ang = msg.angular.z
+
+    def _on_odom(self, msg: Odometry):
+        self._odom_v = msg.twist.twist.linear.x
+        self._odom_omega = msg.twist.twist.angular.z
+        self._odom_seen = True
 
     def _on_base_imu(self, msg: Imu):
         self._latest_base = msg
@@ -393,12 +490,29 @@ class GimbalLevelingController(Node):
         base_q_rel = quat_multiply(self._base_baseline_q,
                                     (base.orientation.x, base.orientation.y,
                                      base.orientation.z, base.orientation.w))
-        roll_acc, pitch_acc = quat_to_roll_pitch_deg(base_q_rel)
-        roll_acc *= ACC_ROLL_SIGN
-        pitch_acc *= ACC_PITCH_SIGN
+        # body2 로컬 Y가 실제 수직축이라 표준(Z-up) roll/pitch 공식을 바로
+        # 쓰면 안 된다 — BASE_LEVEL_FIX_Q로 로컬 Z가 수직인 프레임으로
+        # 바꾼 뒤에 뽑는다. base_q_rel에 그냥 우측곱만 하면(이전 버그)
+        # baseline=identity일 때도 결과가 BASE_LEVEL_FIX_Q 자체가 돼버려서
+        # "안 움직였는데도 고정 편향(-90도)"이 생겼다. 컨쥬게이션
+        # (conj(FIX)*rel*FIX)으로 해야 "그대로면 0"이 보존된다.
+        base_q_rel_fixed = quat_multiply(
+            quat_multiply(quat_conjugate(BASE_LEVEL_FIX_Q), base_q_rel),
+            BASE_LEVEL_FIX_Q)
+        # quat_to_roll_pitch_deg가 돌려주는 (표준_X 회전, 표준_Y 회전) 중
+        # 표준_X(=body2_X, 그대로)가 실제로는 언덕/다리를 오를 때(차체
+        # pitch) 반응하는 축임을 실측으로 확인(2026-08-31, ramp_bridge
+        # 30도 경사 등판 중 roll_filtered만 ~30deg로 움직이고 pitch는
+        # 안 움직임 — 즉 라벨이 뒤바뀌어 있었다). 그래서 여기서 미리
+        # swap한다: "표준_X 회전"을 pitch로, "표준_Y 회전"을 roll로 쓴다.
+        std_x_rot, std_y_rot = quat_to_roll_pitch_deg(base_q_rel_fixed)
+        roll_acc = std_y_rot * ACC_ROLL_SIGN
+        pitch_acc = std_x_rot * ACC_PITCH_SIGN
 
-        rate_roll = math.degrees(base.angular_velocity.x) * GYRO_ROLL_SIGN
-        rate_pitch = math.degrees(base.angular_velocity.y) * GYRO_PITCH_SIGN
+        # 자이로도 같은 축 대응으로 맞춘다: 표준_Y 회전속도 = -body2_Z,
+        # 표준_X 회전속도 = body2_X(그대로).
+        rate_roll = -math.degrees(base.angular_velocity.z) * GYRO_ROLL_SIGN
+        rate_pitch = math.degrees(base.angular_velocity.x) * GYRO_PITCH_SIGN
 
         # Phase 1: 하단 상보필터
         self.pitch_filtered = ALPHA_BASE * (self.pitch_filtered + rate_pitch * DT) \
@@ -407,12 +521,43 @@ class GimbalLevelingController(Node):
             + (1.0 - ALPHA_BASE) * roll_acc
 
         # Phase 2: 관성 보상 목표각 + ZV
-        q_now = (base.orientation.x, base.orientation.y, base.orientation.z, base.orientation.w)
-        gravity_local = mat_transpose_vec_mul(quat_to_matrix(q_now), (0.0, 0.0, G))
-        ax = (base.linear_acceleration.x - gravity_local[0]) * ACC_ROLL_SIGN
-        ay = (base.linear_acceleration.y - gravity_local[1]) * ACC_PITCH_SIGN
-        raw_target_pitch = math.degrees(math.atan2(ay, G))
-        raw_target_roll = math.degrees(math.atan2(ax, G))
+        #
+        # 실제 하드웨어 영상 기준 요구 거동(2026-08-31):
+        #   1) 병진 없이 회전만 할 때 -> 회전 반대방향으로 롤 뱅킹
+        #   2) 등속 병진 -> 수평 유지
+        #   3) 가속/감속 병진 -> 충격 완화(출렁임 최소화) 방향으로 기울임
+        #   4) 초기 상태 -> 수평
+        #
+        # base IMU 원시 가속도(linear_acceleration)로 직접 구현하려 했으나,
+        # chassis_imu가 붙은 body2 링크가 CAD(Onshape) 임포트 과정에서 생긴
+        # 고정 장착 회전 때문에 로컬 축이 REP-103(Z-up, X-forward)과 맞지
+        # 않는다 — 완전 정지 상태에서도 중력 9.8 m/s^2 전부가 로컬 Y축에서
+        # 읽히고(Z가 아님), 지면 접촉 진동 노이즈까지 겹쳐서 base_q_rel을
+        # 통한 중력 보정으로는 신뢰할 만한 "초과가속도"를 못 얻었다(실측
+        # 확인됨). 대신 /model/new_robot/odometry(root 프레임, 이미 표준
+        # 축)의 선속도/각속도라는 깨끗한 운동학 신호로 세 요구사항을 직접
+        # 구현한다 — IMU 노이즈에 흔들리지 않고, 항상 실제 REP-103 forward/
+        # lateral 축과 일치한다.
+        v = self._odom_v
+        omega = self._odom_omega
+
+        accel_fwd_raw = (v - self._prev_odom_v) / DT
+        self._prev_odom_v = v
+        self._accel_fwd_filt = ACCEL_EST_ALPHA * accel_fwd_raw \
+            + (1.0 - ACCEL_EST_ALPHA) * self._accel_fwd_filt
+
+        # 좌우(원심) 가속도 추정 — 등속 코너링 시의 실제 물리(v*omega),
+        # v=0일 때는 자동으로 0이 되므로 아래 스핀뱅킹 항과 안 겹친다.
+        a_lat_est = v * omega
+
+        # 요구사항 1: 병진 속도가 거의 0인데 회전만 하면, 회전 반대방향으로
+        # 롤을 최대치로 기울인다. |v|가 커질수록(=실제로 달리기 시작하면)
+        # 부드럽게 꺼져서 위 a_lat_est(코너링) 항에 자리를 넘겨준다.
+        fade = max(0.0, 1.0 - abs(v) / V_FADE_MS)
+        spin_bank_deg = -SPIN_BANK_SIGN * K_SPIN_BANK_DEG_PER_RADS * omega * fade
+
+        raw_target_roll = math.degrees(math.atan2(a_lat_est, G)) * ACC_ROLL_SIGN + spin_bank_deg
+        raw_target_pitch = math.degrees(math.atan2(self._accel_fwd_filt, G)) * ACC_PITCH_SIGN
 
         self.internal_pitch = PITCH_SMOOTH_NEW * raw_target_pitch \
             + (1.0 - PITCH_SMOOTH_NEW) * self.internal_pitch
@@ -468,7 +613,7 @@ class GimbalLevelingController(Node):
         # 임계값을 넘을 때만 게인이 1로 올라간다. 정지 상태에서는 0으로
         # 수렴해서 아래 슬로싱 추정 레이어를 사실상 꺼버린다.
         gyro_deg = math.hypot(rate_roll, rate_pitch)
-        acc_mag = math.hypot(ax, ay)
+        acc_mag = math.hypot(a_lat_est, self._accel_fwd_filt)
         gate = self.activity_gate.update(
             self._latest_cmd_lin, self._latest_cmd_ang, gyro_deg, acc_mag, DT)
 
@@ -495,14 +640,23 @@ class GimbalLevelingController(Node):
         target_roll_deg += slosh_roll_deg
         target_pitch_deg += slosh_pitch_deg
 
-        # 게이트를 전체 보정(베이스 레벨링 + trim + 슬로싱)에 한 번에 적용한다.
-        # 정지/잔잔한 상태(gate≈0)에서는 베이스 필터나 trim에 남아있는 잔여
-        # 오차/드리프트가 있어도 최종 목표각은 0(수평)으로 수렴하고, 실제
-        # 주행/외란이 감지되면(gate≈1) 전체 보정 로직이 원래대로 작동한다.
-        # "평소엔 최대한 수평 유지, 필요할 때만 짐벌이 움직인다"는 요구사항을
-        # 여기서 구현한다.
+        # 게이트를 동적 보정(스핀뱅킹/가감속 충격완화 + trim + 슬로싱)에
+        # 적용한다. 정지/잔잔한 상태(gate≈0)에서는 이 성분들에 남아있는
+        # 잔여 오차/드리프트가 있어도 0으로 수렴하고, 실제 주행/외란이
+        # 감지되면(gate≈1) 원래대로 작동한다.
         target_roll_deg *= gate
         target_pitch_deg *= gate
+
+        # 차체 자세 레벨링 — gate와 무관하게 항상 켜져 있다. 주행 여부와
+        # 상관없이 차체가 (지형이든 수동 조작이든) 기울어져 있으면 트레이가
+        # 그만큼 반대로 돌아서 항상 월드 바닥과 수평을 유지해야 하기 때문.
+        # 축 보정이 혹시 틀려도 조인트가 폭주하지 않도록 상한을 건다.
+        base_level_roll = max(-BASE_LEVEL_MAX_DEG, min(BASE_LEVEL_MAX_DEG,
+            BASE_LEVEL_ROLL_SIGN * BASE_LEVEL_GAIN * (-self.roll_filtered)))
+        base_level_pitch = max(-BASE_LEVEL_MAX_DEG, min(BASE_LEVEL_MAX_DEG,
+            BASE_LEVEL_PITCH_SIGN * BASE_LEVEL_GAIN * (-self.pitch_filtered)))
+        target_roll_deg += base_level_roll
+        target_pitch_deg += base_level_pitch
 
         # 최종 출력: degree -> radian, 조인트 리밋 클램프 후 출력단 저역통과 필터
         roll_cmd_raw = max(-JOINT_LIMIT_RAD, min(JOINT_LIMIT_RAD, math.radians(target_roll_deg)))
@@ -513,8 +667,12 @@ class GimbalLevelingController(Node):
         self.pitch_cmd_filtered = OUTPUT_SMOOTH * pitch_cmd_raw \
             + (1.0 - OUTPUT_SMOOTH) * self.pitch_cmd_filtered
 
-        self.roll_pub.publish(Float64(data=self.roll_cmd_filtered))
-        self.pitch_pub.publish(Float64(data=self.pitch_cmd_filtered))
+        max_step_rad = math.radians(MAX_CMD_RATE_DEG_S) * DT
+        self.roll_cmd_out = slew_limit(self.roll_cmd_filtered, self.roll_cmd_out, max_step_rad)
+        self.pitch_cmd_out = slew_limit(self.pitch_cmd_filtered, self.pitch_cmd_out, max_step_rad)
+
+        self.roll_pub.publish(Float64(data=self.roll_cmd_out))
+        self.pitch_pub.publish(Float64(data=self.pitch_cmd_out))
 
         # 디버그: roll 쪽 각 단계 값을 분리해서 확인 (원인 파악용, 끝나면 지울 것)
         self.get_logger().info(
