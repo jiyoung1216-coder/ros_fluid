@@ -1,0 +1,98 @@
+<?xml version="1.0" ?>
+<!--
+  bench_fixed_step.sdf
+
+  1단계 벤치마크 전용 world. /usr/share/gz/gz-sim8/worlds/empty.sdf를
+  베이스로 하되(플러그인/조명/지면 구성은 완전히 동일), <physics> 블록만
+  명시적으로 고정한다.
+
+  기존 ramp_bridge.sdf/hill.sdf는 이 파일 때문에 전혀 수정하지 않았고,
+  new_robot/launch/gazebo.launch.py도 무수정 — 이미 있는 gz_extra_args
+  런치 인자로 이 world 경로를 empty.sdf 대신 넘기기만 하면 된다:
+
+    ros2 launch new_robot gazebo.launch.py \
+      gz_extra_args:="-s -r <이 파일의 절대경로>"
+
+  real_time_factor: 2026-09-06 승인 답변은 "headless + RTF 상향(2~5)"이었고
+  4.0으로 1차 채택했으나, 실제 오염 검증 실행에서 심각한 버그를 발견해
+  1.0으로 되돌린다 — bench_drive_profile.py의 phase 전환과
+  bench_runner.py의 각종 대기(WARMUP_S, extra_wait_s 등)가 전부
+  time.sleep()(wall-clock) 기반인데, RTF>1이면 "명목 N초 구간"이 실제로는
+  sim-time 기준 N*RTF초로 늘어나 버린다. 실측: 오염 검증에서 명목
+  ~35초 구간이 기록 CSV 기준 124.6초(OFF)/107.4초(ON)로 서로 다르게
+  늘어나(RTF 달성률이 실행마다 다름) excite_end_t 계산 자체가 무효화됨을
+  확인했다. wall-clock 기반 오케스트레이션을 sim-time(/clock) 기반으로
+  다시 짜기 전까지는 RTF=1.0(sim-time과 wall-clock이 1:1로 대응)이 안전한
+  선택이다 — 속도보다 "비교가 무효가 되지 않는 것"(원칙 1)을 우선했다.
+  max_step_size는 원 스펙이 명시한 1000Hz(0.001s)를 그대로 사용.
+
+  결정성의 실질 보증은 sim_control/bench_drive_profile.py의
+  validate_cmdvel_log()(해시/구간 커버리지 검증 + 불일치 시 폐기·재시도)가
+  담당한다.
+-->
+<sdf version="1.6">
+  <world name="bench_fixed_step">
+    <physics name="bench_1ms" type="ignored">
+      <max_step_size>0.001</max_step_size>
+      <real_time_factor>1.0</real_time_factor>
+    </physics>
+    <plugin
+      filename="gz-sim-physics-system"
+      name="gz::sim::systems::Physics">
+    </plugin>
+    <plugin
+      filename="gz-sim-user-commands-system"
+      name="gz::sim::systems::UserCommands">
+    </plugin>
+    <plugin
+      filename="gz-sim-scene-broadcaster-system"
+      name="gz::sim::systems::SceneBroadcaster">
+    </plugin>
+    <plugin
+      filename="gz-sim-contact-system"
+      name="gz::sim::systems::Contact">
+    </plugin>
+
+    <light type="directional" name="sun">
+      <cast_shadows>true</cast_shadows>
+      <pose>0 0 10 0 0 0</pose>
+      <diffuse>0.8 0.8 0.8 1</diffuse>
+      <specular>0.2 0.2 0.2 1</specular>
+      <attenuation>
+        <range>1000</range>
+        <constant>0.9</constant>
+        <linear>0.01</linear>
+        <quadratic>0.001</quadratic>
+      </attenuation>
+      <direction>-0.5 0.1 -0.9</direction>
+    </light>
+
+    <model name="ground_plane">
+      <static>true</static>
+      <link name="link">
+        <collision name="collision">
+          <geometry>
+            <plane>
+              <normal>0 0 1</normal>
+              <size>100 100</size>
+            </plane>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <plane>
+              <normal>0 0 1</normal>
+              <size>100 100</size>
+            </plane>
+          </geometry>
+          <material>
+            <ambient>0.8 0.8 0.8 1</ambient>
+            <diffuse>0.8 0.8 0.8 1</diffuse>
+            <specular>0.8 0.8 0.8 1</specular>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+  </world>
+</sdf>

@@ -22,6 +22,8 @@ from gimbal_control_core import (
     housner_pendulum, hw_force_vector_angle, mat_col_z, normal_to_roll_pitch,
     resultant_normal_body, slew_rate_limit,
 )
+import bench_drive_profile as bdp
+import bench_metrics as bm
 
 DEG = math.pi / 180.0
 _passed = 0
@@ -739,6 +741,123 @@ def test_hw_style():
           core.state == ControlState.FAULT and not out.enable, core.diag.fault_reason)
 
 
+def test_bench_drive_profile():
+    print("\n[결정론 입력 생성기: bench_drive_profile]")
+
+    h1 = bdp.profile_hash(bdp.PHASES)
+    h2 = bdp.profile_hash(bdp.PHASES)
+    check("PHASES 해시는 매번 동일(결정론)", h1 == h2)
+
+    end = bdp.excitation_end_time(bdp.PHASES)
+    # PHASES = [(2,0,0),(3,.8,0),(3,.8,.8),(.5,0,0),(6,0,0)]
+    # 마지막 비-영 구간은 3번째(누적 2+3=5초 시작, 3초 길이) -> 끝 8초
+    check("자극 종료 시각 계산", close(end, 8.0, 1e-9), f"got {end}")
+
+    total = bdp.total_duration(bdp.PHASES)
+    check("총 길이 계산", close(total, 14.5, 1e-9), f"got {total}")
+
+    check("캘리브레이션 프로파일은 자극이 전혀 없음(vx=wz=0)",
+          bdp.excitation_end_time(bdp.CALIBRATION_PHASES) == 0.0)
+
+    # validate_cmdvel_log: 정상 로그
+    good_rows = []
+    t = 0.0
+    while t < total:
+        phase_t = 0.0
+        for dur, vx, wz in bdp.PHASES:
+            if phase_t <= t < phase_t + dur:
+                good_rows.append((t, vx, wz))
+                break
+            phase_t += dur
+        t += bdp.PUBLISH_DT_S
+    valid, reason = bdp.validate_cmdvel_log(good_rows, bdp.PHASES)
+    check("정상 cmd_vel 로그 -> valid", valid, reason)
+
+    truncated_rows = [r for r in good_rows if r[0] < 5.0]  # 중간에 잘린 경우
+    valid2, reason2 = bdp.validate_cmdvel_log(truncated_rows, bdp.PHASES)
+    check("중도 절단된 로그 -> invalid로 판정", not valid2, reason2)
+
+    empty_valid, empty_reason = bdp.validate_cmdvel_log([], bdp.PHASES)
+    check("빈 로그 -> invalid", not empty_valid, empty_reason)
+
+
+def test_bench_metrics():
+    print("\n[지표 계산: bench_metrics]")
+
+    # settling_time: 자극 종료(t=10) 후 즉시 h_calm 근처에 머무는 케이스
+    t = [0, 5, 10, 11, 12, 13, 14, 15]
+    h = [0.09, 0.12, 0.15, 0.10, 0.091, 0.089, 0.090, 0.090]
+    res = bm.settling_time(t, h, h_calm_m=0.09, sigma_h_m=0.002, excite_end_t=10.0, hold_s=2.0)
+    # band = max(0.02, 3*0.002=0.006) = 0.02 -> |h-0.09|<=0.02는 t=11(0.10)부터 이미 만족
+    check("정착 시간: band 안에 2초 연속 유지되는 시점", close(res.time_s, 1.0, 1e-9), str(res))
+    check("정착됨(not_settled=False)", not res.not_settled)
+
+    # 끝까지 정착하지 않는 케이스
+    t2 = [0, 10, 11, 12, 13, 14]
+    h2 = [0.09, 0.15, 0.20, 0.18, 0.16, 0.17]
+    res2 = bm.settling_time(t2, h2, h_calm_m=0.09, sigma_h_m=0.002, excite_end_t=10.0, hold_s=2.0)
+    check("정착 실패 케이스 -> not_settled=True", res2.not_settled)
+
+    check("max_rise: h_calm 대비 최대 상승량",
+          close(bm.max_rise([0.09, 0.13, 0.11], 0.09), 0.04, 1e-9))
+
+    rms = bm.residual_rms([10, 11, 12, 13], [0.09, 0.10, 0.08, 0.09], excite_end_t=10.0, window_s=3.0)
+    check("residual_rms 계산됨(0 아님)", rms > 0.0, str(rms))
+    check("residual_rms: 표본 부족(<2)이면 0",
+          bm.residual_rms([10], [0.09], excite_end_t=10.0) == 0.0)
+
+    check("sustained_rise_over: 4cm 이상 2초 유지 감지",
+          bm.sustained_rise_over([0, 1, 2, 3], [0.09, 0.14, 0.14, 0.14], 0.09, 0.04, hold_s=2.0))
+    check("sustained_rise_over: 못 미치면 False",
+          not bm.sustained_rise_over([0, 1, 2, 3], [0.09, 0.14, 0.09, 0.09], 0.09, 0.04, hold_s=2.0))
+
+    check("settling_band_m: 2cm/3sigma 중 큰 값",
+          close(bm.settling_band_m(0.05), 0.15, 1e-9)
+          and close(bm.settling_band_m(0.001), 0.02, 1e-9))
+
+    # contamination_check: 두 트레이스가 동일하면 오염 0
+    t_off = [0.0, 0.1, 0.2, 0.3]
+    a_off = [(1.0, 0.0, 9.81)] * 4
+    a_on = [(1.0, 0.0, 9.81)] * 4
+    result = bm.contamination_check(t_off, a_off, t_off, a_on, excitation_amplitude_mps2=1.0)
+    check("동일 트레이스 -> 오염 0", close(result.ratio_a, 0.0, 1e-9))
+    check("동일 트레이스 -> contaminated=False", not result.contaminated)
+
+    a_on_shifted = [(1.5, 0.0, 9.81)] * 4  # |Δa|=0.5, 진폭 1.0 대비 50%
+    result2 = bm.contamination_check(t_off, a_off, t_off, a_on_shifted, excitation_amplitude_mps2=1.0)
+    check("50% 편차 -> ratio 0.5 근처", close(result2.ratio_a, 0.5, 1e-6), str(result2))
+    check("10% 초과 -> contaminated=True", result2.contaminated)
+
+    # contamination_check_robust: 드문 스파이크(클램프 근처)를 제외해야
+    # "진짜" 오염과 스파이크 우연 일치를 구분할 수 있음(실측 문제로 발견).
+    clamp = 40.0
+    t_r = [i * 0.1 for i in range(20)]
+    a_off_r = [(1.0, 0.0, 9.81) for _ in range(20)]
+    a_on_r = [(1.0, 0.0, 9.81) for _ in range(20)]
+    # 두 트레이스 모두에 서로 다른 시점(정렬 안 맞는)에 스파이크를 하나씩 심는다
+    a_off_r[5] = (39.5, 0.0, 9.81)
+    a_on_r[15] = (39.7, 0.0, 9.81)
+    res_robust = bm.contamination_check_robust(t_r, a_off_r, t_r, a_on_r, clamp_mps2=clamp)
+    check("robust: 스파이크 2개 모두 제외됨", res_robust.n_excluded_spikes == 2,
+          str(res_robust))
+    check("robust: 스파이크 제외 후 나머지는 동일 트레이스 -> ratio 0",
+          close(res_robust.ratio_rms, 0.0, 1e-9), str(res_robust))
+    check("robust: contaminated=False(스파이크만 다른 지점에 있었을 뿐)",
+          not res_robust.contaminated)
+
+    # fft_spectrum / dominant_frequency: 알려진 사인파로 검증
+    fs = 100.0
+    n = 400
+    freq_true = 2.7
+    tt = [i / fs for i in range(n)]
+    yy = [math.sin(2 * math.pi * freq_true * ti) for ti in tt]
+    f_dom, mag = bm.dominant_frequency(tt, yy, 0.0, 10.0)
+    check("dominant_frequency가 주입한 주파수 근처를 찾음",
+          f_dom is not None and abs(f_dom - freq_true) < (fs / n) * 2,
+          f"got {f_dom}, expected~{freq_true}")
+    check("스펙트럼 크기는 0보다 큼", mag > 0.0)
+
+
 def main():
     print("=" * 70)
     print("gimbal_control_core 단위 시험")
@@ -757,6 +876,8 @@ def main():
     test_deadband_in_loop()
     test_cnn_interface()
     test_hw_style()
+    test_bench_drive_profile()
+    test_bench_metrics()
     print("\n" + "=" * 70)
     print(f"전체 통과: {_passed}개 검사")
     print("=" * 70)

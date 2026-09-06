@@ -15,6 +15,11 @@ def generate_launch_description():
     # 예: gz_extra_args:="--record-path /tmp/gz_record_run" 처럼 넘겨서
     # 나중에 `gz sim -r --playback <path>`로 그대로 재생할 수 있게 한다.
     gz_extra_args_arg = DeclareLaunchArgument('gz_extra_args', default_value='')
+    # 2026-09-06: 1단계 벤치마크(bench_runner.py)가 물리 스텝을 고정한
+    # new_robot/worlds/bench_fixed_step.sdf를 로드하기 위해 추가.
+    # 기본값이 기존 하드코딩값('empty.sdf ')과 완전히 동일해 미지정 시
+    # 기존 동작 그대로다 — 토픽 브릿지는 건드리지 않고 파라미터 인자만 추가.
+    world_file_arg = DeclareLaunchArgument('world_file', default_value='empty.sdf ')
     pkg_share = FindPackageShare('new_robot')
     urdf_path = PathJoinSubstitution([pkg_share, 'urdf', 'new_robot.urdf'])
     robot_description = {'robot_description': Command(['xacro ', urdf_path])}
@@ -39,7 +44,7 @@ def generate_launch_description():
             )
         ),
         launch_arguments={
-            'gz_args': ['empty.sdf ', LaunchConfiguration('gz_extra_args')],
+            'gz_args': [LaunchConfiguration('world_file'), LaunchConfiguration('gz_extra_args')],
         }.items(),
     )
 
@@ -180,6 +185,7 @@ def generate_launch_description():
 
     return LaunchDescription([
         gz_extra_args_arg,
+        world_file_arg,
         set_resource_path,
         gz_sim,
         robot_state_publisher,

@@ -22,6 +22,7 @@ import argparse
 import csv
 import math
 import os
+import statistics
 import sys
 
 
@@ -116,6 +117,104 @@ def settling_time(t, y, band_deg, hold_s=1.0):
         else:
             i += 1
     return float("nan")
+
+
+def _dft_mag(t, y, dt):
+    """numpy가 없을 때 쓰는 순수 파이썬 대체 DFT(O(n^2)).
+    표본 수가 큰 전체 실행 로그에 쓰면 느리므로, numpy 미설치 환경에서만
+    폴백으로 쓰인다(이 환경엔 numpy가 있어 평소엔 fft_compare가 이쪽을
+    타지 않는다)."""
+    n = len(y)
+    mean_y = sum(y) / n
+    yc = [v - mean_y for v in y]
+    freqs, mags = [], []
+    for k in range(1, n // 2):
+        re = sum(v * math.cos(-2.0 * math.pi * k * i / n) for i, v in enumerate(yc))
+        im = sum(v * math.sin(-2.0 * math.pi * k * i / n) for i, v in enumerate(yc))
+        freqs.append(k / (n * dt))
+        mags.append(math.sqrt(re * re + im * im) / n)
+    return freqs, mags
+
+
+def fft_compare(t, input_y, response_y, f_min_hz=0.0, f_max_hz=None):
+    """자극 입력(input_y)과 응답(response_y)의 주파수 성분을 비교한다.
+    같은 시간축 t(균일 간격 가정, 중앙값 dt 사용) 위의 두 시계열이 필요하다.
+
+    2단계 가설 검증(짐벌 ON이 슬로싱 공진 주파수 성분을 증폭하는지 확인)의
+    진단 보조로 쓴다. 엄밀한 신호처리학적 coherence는 아니고,
+    ratio = |FFT(response)| / |FFT(input)| 를 각 주파수에서 계산해 "입력
+    대비 응답이 특정 주파수에서 얼마나 부풀었는지"를 보는 간단 지표다.
+
+    반환: dict(freqs, input_mag, response_mag, ratio) — 리스트 4개.
+    """
+    n = len(t)
+    if n < 4 or len(input_y) != n or len(response_y) != n:
+        return {"freqs": [], "input_mag": [], "response_mag": [], "ratio": []}
+
+    dts = [t[i + 1] - t[i] for i in range(n - 1)]
+    dt = statistics.median(dts)
+    if dt <= 0:
+        return {"freqs": [], "input_mag": [], "response_mag": [], "ratio": []}
+
+    try:
+        import numpy as np
+        in_arr = np.asarray(input_y, dtype=float)
+        out_arr = np.asarray(response_y, dtype=float)
+        freqs_full = np.fft.rfftfreq(n, d=dt)
+        in_mag_full = np.abs(np.fft.rfft(in_arr - in_arr.mean())) / n
+        out_mag_full = np.abs(np.fft.rfft(out_arr - out_arr.mean())) / n
+        freqs = freqs_full[1:].tolist()
+        in_mag = in_mag_full[1:].tolist()
+        out_mag = out_mag_full[1:].tolist()
+    except ImportError:
+        freqs, in_mag = _dft_mag(t, input_y, dt)
+        _, out_mag = _dft_mag(t, response_y, dt)
+
+    if f_min_hz > 0.0 or f_max_hz is not None:
+        keep = [i for i, f in enumerate(freqs)
+                if f >= f_min_hz and (f_max_hz is None or f <= f_max_hz)]
+        freqs = [freqs[i] for i in keep]
+        in_mag = [in_mag[i] for i in keep]
+        out_mag = [out_mag[i] for i in keep]
+
+    eps = 1e-12
+    ratio = [o / (i + eps) for i, o in zip(in_mag, out_mag)]
+    return {"freqs": freqs, "input_mag": in_mag, "response_mag": out_mag, "ratio": ratio}
+
+
+def plot_fft_compare(result, out_path, title=""):
+    """fft_compare()의 결과를 그림으로 저장한다. matplotlib 없으면 건너뜀
+    (make_plot과 동일한 선택적 의존성 패턴)."""
+    try:
+        import matplotlib
+        matplotlib.use("Agg")
+        import matplotlib.pyplot as plt
+    except ImportError:
+        print("\n[fft plot] matplotlib이 없어 그림을 건너뜁니다 "
+              "(pip install matplotlib)")
+        return
+
+    freqs = result["freqs"]
+    if not freqs:
+        print("\n[fft plot] 유효한 주파수 성분이 없어 그림을 건너뜁니다")
+        return
+
+    fig, axes = plt.subplots(2, 1, figsize=(9, 7), sharex=True)
+    axes[0].plot(freqs, result["input_mag"], label="input", lw=1.2)
+    axes[0].plot(freqs, result["response_mag"], label="response", lw=1.2)
+    axes[0].set_ylabel("magnitude")
+    axes[0].set_title(title or "입력 vs 응답 스펙트럼")
+    axes[0].legend(fontsize=8)
+    axes[0].grid(alpha=0.3)
+
+    axes[1].plot(freqs, result["ratio"], color="tab:red", lw=1.2)
+    axes[1].set_ylabel("response/input ratio")
+    axes[1].set_xlabel("frequency [Hz]")
+    axes[1].grid(alpha=0.3)
+
+    fig.tight_layout()
+    fig.savefig(out_path, dpi=140)
+    print(f"\n[fft plot] 저장: {out_path}")
 
 
 def analyze(path):
