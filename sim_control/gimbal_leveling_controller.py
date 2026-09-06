@@ -7,14 +7,14 @@ gimbal_control_core.ControlCore를 가제보에 연결하는 얇은 계층이다
 실물에서는 이 파일 대신 SPI/CAN 어댑터를 쓰고 코어는 그대로 재사용한다.
 
 실행
-    # 같은 폴더에 gimbal_control_core.py 가 있어야 한다
+    # 같은 폴더에 gimbal_control_core.py 가 있어야 한다. 기본 프리셋
+    # (base=body2_current_base, tray=cad_rotated_tray)이 현재 URDF에
+    # 맞춰져 있으므로 축 정합 파라미터는 따로 안 줘도 된다.
     python3 gimbal_leveling_controller.py --ros-args -p use_sim_time:=true
 
-    # 축 정합이 아직 안 된 URDF에서 돌릴 때 (아래 '축 정합' 참조)
-    # 주의: cad_rotated_base는 root 링크 기준이라 현재 URDF(chassis_imu가
-    # body2에 부착)에는 맞지 않는다. body2_current_base를 써야 한다.
+    # URDF가 바뀌어 identity(센서가 이미 REP-103대로 정렬됨)로 돌려야 할 때
     python3 gimbal_leveling_controller.py --ros-args -p use_sim_time:=true \
-        -p base_axis_preset:=body2_current_base -p tray_axis_preset:=cad_rotated_tray
+        -p base_axis_preset:=identity -p tray_axis_preset:=identity
 
 토픽
     구독  /imu           sensor_msgs/Imu     하단 차체 (root 링크)
@@ -32,8 +32,10 @@ gimbal_control_core.ControlCore를 가제보에 연결하는 얇은 계층이다
     가정하므로 그대로 두면 목표각이 엉킨다.
 
     근본 해결은 URDF의 <sensor>에 <pose>를 넣어 센서를 정렬하는 것이다.
-    그 전까지는 이 노드의 *_axis_preset 파라미터로 소프트웨어 리맵을 걸 수 있다.
-    노드 시작 시 자동 진단을 출력하므로 어느 프리셋이 맞는지 바로 알 수 있다.
+    그 전까지는 이 노드의 *_axis_preset 파라미터로 소프트웨어 리맵을 걸며,
+    기본값을 현재 URDF에 맞춘 body2_current_base/cad_rotated_tray로
+    두었다(2026-09-05, 가제보 headless 실행으로 실측 확인). 노드 시작 시
+    자동 진단을 출력하므로 URDF가 바뀌면 그 로그로 다시 확인할 것.
 """
 
 import math
@@ -47,7 +49,7 @@ from std_msgs.msg import Bool, Float64, String
 
 from gimbal_control_core import (
     GRAVITY, ControlCore, ControlState, CoreConfig, ImuPair, ImuSample,
-    MotorFeedback, compute_slosh_modes, housner_pendulum,
+    MotorFeedback, compute_slosh_modes, compute_slosh_modes_rect, housner_pendulum,
 )
 
 # ---------------------------------------------------------------------------
@@ -89,8 +91,7 @@ def diagnose_axes(ax, ay, az):
     axis = "XYZ"[idx]
     sign = "+" if v[idx] > 0 else "-"
     if idx == 2:
-        return (f"정상 (중력이 Z축, {sign}{abs(v[2]):.2f} m/s^2, |a|={mag:.2f}) "
-                f"— identity 프리셋 사용")
+        return (f"정상 (중력이 Z축, {sign}{abs(v[2]):.2f} m/s^2, |a|={mag:.2f})")
     return (f"어긋남: 중력이 {axis}축에 실림 ({sign}{abs(v[idx]):.2f} m/s^2, "
             f"|a|={mag:.2f}). REP-103이면 Z에 있어야 한다. "
             f"URDF <sensor><pose>로 정합하거나 *_axis_preset을 설정할 것")
@@ -109,8 +110,19 @@ class GimbalLevelingController(Node):
         p("joint_states_topic", "/joint_states")
         p("roll_cmd_topic", "/gimbal_roll_cmd")
         p("pitch_cmd_topic", "/gimbal_pitch_cmd")
-        p("base_axis_preset", "identity")
-        p("tray_axis_preset", "identity")
+        # 2026-09-05: 기본값을 identity에서 실측 확정 프리셋으로 변경.
+        # 현재 new_robot.urdf는 chassis_imu가 root가 아니라 body2 링크에,
+        # tray_imu가 default_4 링크에 <sensor><pose> 정렬 없이 붙어 있어
+        # identity로는 중력이 Z가 아니라 다른 축에 실린다(축 진단 경고 참조).
+        # Gazebo 실행 중 실측(가제보 headless 실행, /imu, /imu_tray 원시값
+        # 확인)으로 base=body2_current_base가 중력을 정확히 +Z로 옮기는
+        # 것을 확인했다. tray는 정지 상태 값만으로는 cad_rotated_base와
+        # cad_rotated_tray가 둘 다 우연히 Z축에 실려 구분이 안 되므로,
+        # 파일 상단 docstring에 이미 기록된 기하학적 유도값(cad_rotated_tray)을
+        # 그대로 채택했다. 근본 해결은 URDF <sensor><pose> 정렬이며, 이
+        # 프리셋들은 그 전까지의 소프트웨어 우회다.
+        p("base_axis_preset", "body2_current_base")
+        p("tray_axis_preset", "cad_rotated_tray")
         p("roll_joint_name", "revolute_1")
         p("pitch_joint_name", "revolute_2")
         # Housner 등가 진자 조인트 이름. URDF에 추가되면 로깅에 사용된다.
@@ -122,6 +134,11 @@ class GimbalLevelingController(Node):
         # 코어 설정 중 실험에서 자주 바꾸는 것만 노출
         p("tank_radius_m", 0.055)
         p("fill_height_m", 0.090)
+        # "cylinder"(기본) | "rect". rect일 때 tank_side_m 사용, tank_radius_m은
+        # 무시된다. 실물 탱크(11x11cm, 350mL) 재현: tank_shape:=rect
+        # tank_side_m:=0.11 fill_height_m:=0.02893
+        p("tank_shape", "cylinder")
+        p("tank_side_m", 0.11)
         p("enable_feedforward", True)
         p("enable_zv", True)
         p("enable_gain_scheduling", True)
@@ -131,17 +148,68 @@ class GimbalLevelingController(Node):
         p("ki_trim", 0.01)
         p("kp_min", 0.10)
         p("kp_max", 0.50)
+        # 목표각 지수평활 계수 — 값이 작을수록 느리고 부드럽다(슬루율 완화에
+        # 해당). 기본값은 원본 pid_control_parkver 계승값(roll 0.10/pitch 0.30).
+        p("smooth_alpha_roll", 0.10)
+        p("smooth_alpha_pitch", 0.30)
         p("joint_limit_rad", 0.4363)
         p("require_motor_feedback", False)
+        # 조인트각 0 == 트레이 완전 수평이 아닌 만큼(조립/CAD 기하 오프셋).
+        # 2026-09-05 실측: 정지+ACTIVE 상태에서 tray_pitch_deg가 약 -3.39도,
+        # tray_roll_deg가 약 -0.76도에 계속 고정되는 걸 발견. p_gain을
+        # 3배(15->45) 올려도 값이 그대로라(-3.39도) 중력 처짐(정상상태
+        # 오차)이 아니라 고정 기하 오프셋으로 판단, p_gain은 원복하고 대신
+        # 여기서 보정한다.
+        #
+        # 2026-09-06 재보정: 위 1차 보정값을 적용한 뒤에도 tray_roll_deg가
+        # -0.6833도로 계속 남는 걸 발견. 서로 다른 시각에 독립적으로 두 번
+        # 실행해도 소수점 4자리까지 완전히 똑같은 값이 나와(물리엔진 노이즈
+        # 아님, 100% 결정론적) 1차 측정값 자체가 부정확했던 것으로 확인.
+        # raw_bias = 잔차 + 기존 보정값 역산으로 정확한 값을 다시 구함
+        # (pitch도 같은 방식으로 잔차 0.1824도를 마저 흡수):
+        #   roll:  raw = -0.6833° + (-0.7550°) = -1.4383° -> -0.025103 rad
+        #   pitch: raw =  0.1824° + (-3.3897°) = -3.2076° -> -0.055983 rad
+        # 다른 URDF/씬으로 바꾸면 diag 절차(README 참조)로 다시 재야 한다.
+        p("tray_zero_offset_roll_rad", -0.025103)
+        p("tray_zero_offset_pitch_rad", -0.055983)
+
+        # --- HW 스타일 경로 (실물 Liquid_Control_Robot 시리얼 튜닝 명령 대응) ---
+        p("enable_hw_style", False)
+        p("gain_horiz", 1.00)        # [g]  GAIN
+        p("gain_accel", 1.00)        # [ag] ACC_GAIN
+        p("force_lpf_alpha", 0.20)   # [ad] ACC_LPF
+        p("dir_accel", 1.0)          # DIR_ACC — TODO: 실측 필요
+        p("cmd_limit_deg", 45.0)     # LIMIT_DEG
+        p("acc_ref_limit_deg", 45.0)  # ACC_REF_LIMIT
+        p("act_limit_deg", 55.0)     # ACT_LIMIT_DEG
+        p("cmd_slew_deg_s", 120.0)   # [r] MAX_RATE 실측 확정 120°/s
+        p("cmd_lpf_alpha", 0.30)     # [f] CMD_LPF
+        p("enable_zv_hw", True)      # [zv]
+        p("zv_hw_freq_hz", 2.00)     # [zf]
+        p("zv_hw_mode", 2)           # [zm] 2=ZV, 3=ZVD
+        p("enable_soft_return", False)  # [sr] — True면 enable_zv_hw는 자동 OFF
+        p("soft_return_active_deg", 1.50)   # [sra]
+        p("soft_return_end_deg", 0.75)      # [sre]
+        p("soft_return_dwell_ms", 30.0)     # [srd]
+        p("soft_return_hold_ms", 100.0)     # [srh]
+        p("soft_return_return_ms", 120.0)   # [srr]
+        p("motor_kp_pitch", 4.0)     # [kpp]
+        p("motor_kd_pitch", 0.20)    # [kdp]
+        p("motor_kp_roll", 2.0)      # [kpr]
+        p("motor_kd_roll", 0.13)     # [kdr]
+        p("motor_ff_j_pitch", 0.0038)  # [fj]
+        p("motor_ff_j_roll", 0.0)      # [fjr]
 
         g = lambda n: self.get_parameter(n).value  # noqa: E731
 
         hz = float(g("control_hz"))
         self.dt_nominal = 1.0 / hz
 
-        self.base_spec = AXIS_PRESETS.get(g("base_axis_preset"),
+        self.base_preset_name = g("base_axis_preset")
+        self.tray_preset_name = g("tray_axis_preset")
+        self.base_spec = AXIS_PRESETS.get(self.base_preset_name,
                                           AXIS_PRESETS["identity"])
-        self.tray_spec = AXIS_PRESETS.get(g("tray_axis_preset"),
+        self.tray_spec = AXIS_PRESETS.get(self.tray_preset_name,
                                           AXIS_PRESETS["identity"])
         self.roll_joint = g("roll_joint_name")
         self.pitch_joint = g("pitch_joint_name")
@@ -153,6 +221,8 @@ class GimbalLevelingController(Node):
         cfg.nominal_dt_s = self.dt_nominal
         cfg.tank_radius_m = float(g("tank_radius_m"))
         cfg.fill_height_m = float(g("fill_height_m"))
+        cfg.tank_shape = str(g("tank_shape"))
+        cfg.tank_side_m = float(g("tank_side_m"))
         cfg.enable_feedforward = bool(g("enable_feedforward"))
         cfg.enable_zv = bool(g("enable_zv"))
         cfg.enable_gain_scheduling = bool(g("enable_gain_scheduling"))
@@ -162,8 +232,39 @@ class GimbalLevelingController(Node):
         cfg.ki_trim = float(g("ki_trim"))
         cfg.kp_min = float(g("kp_min"))
         cfg.kp_max = float(g("kp_max"))
+        cfg.smooth_alpha_roll = float(g("smooth_alpha_roll"))
+        cfg.smooth_alpha_pitch = float(g("smooth_alpha_pitch"))
         cfg.joint_limit_rad = float(g("joint_limit_rad"))
         cfg.require_motor_feedback = bool(g("require_motor_feedback"))
+        cfg.tray_zero_offset_roll_rad = float(g("tray_zero_offset_roll_rad"))
+        cfg.tray_zero_offset_pitch_rad = float(g("tray_zero_offset_pitch_rad"))
+
+        cfg.enable_hw_style = bool(g("enable_hw_style"))
+        cfg.gain_horiz = float(g("gain_horiz"))
+        cfg.gain_accel = float(g("gain_accel"))
+        cfg.force_lpf_alpha = float(g("force_lpf_alpha"))
+        cfg.dir_accel = float(g("dir_accel"))
+        cfg.cmd_limit_rad = math.radians(float(g("cmd_limit_deg")))
+        cfg.acc_ref_limit_rad = math.radians(float(g("acc_ref_limit_deg")))
+        cfg.act_limit_rad = math.radians(float(g("act_limit_deg")))
+        cfg.cmd_slew_rads = math.radians(float(g("cmd_slew_deg_s")))
+        cfg.cmd_lpf_alpha = float(g("cmd_lpf_alpha"))
+        cfg.enable_zv_hw = bool(g("enable_zv_hw"))
+        cfg.zv_hw_freq_hz = float(g("zv_hw_freq_hz"))
+        cfg.zv_hw_mode = int(g("zv_hw_mode"))
+        cfg.enable_soft_return = bool(g("enable_soft_return"))
+        cfg.soft_return_active_deg = float(g("soft_return_active_deg"))
+        cfg.soft_return_end_deg = float(g("soft_return_end_deg"))
+        cfg.soft_return_dwell_ms = float(g("soft_return_dwell_ms"))
+        cfg.soft_return_hold_ms = float(g("soft_return_hold_ms"))
+        cfg.soft_return_return_ms = float(g("soft_return_return_ms"))
+        cfg.motor_kp_pitch = float(g("motor_kp_pitch"))
+        cfg.motor_kd_pitch = float(g("motor_kd_pitch"))
+        cfg.motor_kp_roll = float(g("motor_kp_roll"))
+        cfg.motor_kd_roll = float(g("motor_kd_roll"))
+        cfg.motor_ff_j_pitch = float(g("motor_ff_j_pitch"))
+        cfg.motor_ff_j_roll = float(g("motor_ff_j_roll"))
+
         self.core = ControlCore(cfg)
         self.core.init_control()
 
@@ -199,17 +300,27 @@ class GimbalLevelingController(Node):
     # -- 시작 안내 -------------------------------------------------------
 
     def _announce(self, cfg: CoreConfig):
-        f1, f2 = compute_slosh_modes(cfg.tank_radius_m, cfg.fill_height_m)
-        h = housner_pendulum(cfg.tank_radius_m, cfg.fill_height_m)
         log = self.get_logger()
+        if cfg.tank_shape == "rect":
+            f1, f2 = compute_slosh_modes_rect(cfg.tank_side_m, cfg.fill_height_m)
+        else:
+            f1, f2 = compute_slosh_modes(cfg.tank_radius_m, cfg.fill_height_m)
         log.info("=" * 64)
         log.info("짐벌 레벨링 제어 시작")
         log.info(f"  제어주기      {1.0/self.dt_nominal:.1f} Hz")
-        log.info(f"  탱크          R={cfg.tank_radius_m*1000:.1f}mm "
-                 f"h={cfg.fill_height_m*1000:.1f}mm")
-        log.info(f"  슬로싱 모드   f1={f1:.3f}Hz  f2={f2:.3f}Hz")
-        log.info(f"  등가 진자     m1={h['m1_kg']:.4f}kg  L={h['length_m']*1000:.2f}mm  "
-                 f"피벗={h['pivot_height_m']*1000:.2f}mm")
+        if cfg.tank_shape == "rect":
+            log.info(f"  탱크          rect L={cfg.tank_side_m*1000:.1f}mm "
+                     f"h={cfg.fill_height_m*1000:.1f}mm")
+            log.info(f"  슬로싱 모드   f1={f1:.3f}Hz  f2={f2:.3f}Hz")
+            log.info("  등가 진자     rect 탱크는 물리 진자 모델(housner_pendulum)"
+                     " 미구현 — URDF slosh_pendulum은 원통 근사값을 그대로 씀")
+        else:
+            h = housner_pendulum(cfg.tank_radius_m, cfg.fill_height_m)
+            log.info(f"  탱크          cylinder R={cfg.tank_radius_m*1000:.1f}mm "
+                     f"h={cfg.fill_height_m*1000:.1f}mm")
+            log.info(f"  슬로싱 모드   f1={f1:.3f}Hz  f2={f2:.3f}Hz")
+            log.info(f"  등가 진자     m1={h['m1_kg']:.4f}kg  L={h['length_m']*1000:.2f}mm  "
+                     f"피벗={h['pivot_height_m']*1000:.2f}mm")
         log.info(f"  플래그        FF={cfg.enable_feedforward} ZV={cfg.enable_zv} "
                  f"GS={cfg.enable_gain_scheduling} TRIM={cfg.enable_trim} "
                  f"I={cfg.enable_integral}")
@@ -221,6 +332,11 @@ class GimbalLevelingController(Node):
                  f"(실물에서 재튜닝 대상)")
         log.info(f"  조인트 한계   +-{math.degrees(cfg.joint_limit_rad):.2f}deg")
         log.info(f"  모터 피드백   요구={cfg.require_motor_feedback}")
+        log.info(f"  HW 스타일     {cfg.enable_hw_style} "
+                 f"(g={cfg.gain_horiz:.2f} ag={cfg.gain_accel:.2f} "
+                 f"zf={cfg.zv_hw_freq_hz:.2f}Hz sr={cfg.enable_soft_return} "
+                 f"limit=+-{math.degrees(cfg.cmd_limit_rad):.0f}deg "
+                 f"slew={math.degrees(cfg.cmd_slew_rads):.0f}deg/s)")
         if not self.get_parameter("use_sim_time").value:
             log.warn("  use_sim_time=false — 가제보와 함께 쓸 때는 true로 두세요")
         if self.auto_activate:
@@ -252,7 +368,7 @@ class GimbalLevelingController(Node):
                    msg.linear_acceleration.z)
             self.get_logger().info(f"[축 진단] base 원시값: {diagnose_axes(*raw)}")
             self.get_logger().info(
-                f"[축 진단] base 리맵후: "
+                f"[축 진단] base 리맵후({self.base_preset_name}): "
                 f"{diagnose_axes(self._base.ax_mps2, self._base.ay_mps2, self._base.az_mps2)}")
 
     def _on_tray(self, msg: Imu):
@@ -338,6 +454,13 @@ class GimbalLevelingController(Node):
         "joint_roll_deg", "joint_pitch_deg",
         "slosh_x_deg", "slosh_y_deg",
         "zv_f1_hz", "zv_f2_hz", "freq_source", "enabled",
+        # HW 스타일 경로 진단(analyze_log.py 비교용). enable_hw_style=False면
+        # hw_style=0이고 나머지는 0/DIRECT로 고정된다.
+        "hw_style", "force_roll_deg", "force_pitch_deg",
+        "hw_shaped_roll_deg", "hw_shaped_pitch_deg",
+        "soft_return_phase_roll", "soft_return_phase_pitch",
+        "ff_velocity_roll_deg_s", "ff_velocity_pitch_deg_s",
+        "ff_torque_roll_nm", "ff_torque_pitch_nm",
     ]
 
     def _open_log(self, path):
@@ -379,6 +502,12 @@ class GimbalLevelingController(Node):
             f"{deg(sy):.4f}" if sy == sy else "nan",
             f"{d.zv_f1_hz:.4f}", f"{d.zv_f2_hz:.4f}", d.slosh_freq_source,
             "1" if out.enable else "0",
+            "1" if d.hw_style_active else "0",
+            f"{deg(d.force_roll_rad):.4f}", f"{deg(d.force_pitch_rad):.4f}",
+            f"{deg(d.hw_shaped_roll_rad):.4f}", f"{deg(d.hw_shaped_pitch_rad):.4f}",
+            d.soft_return_phase_roll, d.soft_return_phase_pitch,
+            f"{deg(out.ff_velocity_roll_rads):.4f}", f"{deg(out.ff_velocity_pitch_rads):.4f}",
+            f"{out.ff_torque_roll_nm:.4f}", f"{out.ff_torque_pitch_nm:.4f}",
         ]
         self._log.write(",".join(row) + "\n")
 

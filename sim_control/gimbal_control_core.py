@@ -92,6 +92,15 @@ class ControlOutput:
     max_velocity_rads: float = 0.0
     enable: bool = False
 
+    # HW 스타일 경로 진단 전용(실물 MIT 피드포워드 v_des/t_ff에 대응).
+    # Gazebo는 위치 PID로 구동되므로 이 값들은 어댑터가 발행하지 않는다 —
+    # analyze_log.py로 실물 로그와 비교할 때만 쓴다. enable_hw_style=False면
+    # 항상 0.0이다.
+    ff_velocity_roll_rads: float = 0.0
+    ff_velocity_pitch_rads: float = 0.0
+    ff_torque_roll_nm: float = 0.0
+    ff_torque_pitch_nm: float = 0.0
+
 
 class ControlState(IntEnum):
     """CONTROL_INTEGRATION_TASK.md의 상태기계.
@@ -166,8 +175,19 @@ class CoreConfig:
     #       현재 시뮬레이션 탱크는 내반경 55mm(f1~2.88Hz)로 21% 어긋난다.
     #       실물 탱크 치수를 확인해 아래 두 값을 맞출 것.
     tank_radius_m: float = 0.055      # water_tank.stl 내반경 (외 60mm - 벽 5mm)
-    fill_height_m: float = 0.090      # 정지 수위
+    fill_height_m: float = 0.090      # 정지 수위 (tank_shape="rect"면 side_m 기준 높이로 별도 설정할 것)
     slosh_damping_ratio: float = 0.01  # 저점성 액체 통상값. 실측으로 대체 권장
+
+    # 탱크 형상 선택 (2026-09-05 추가). "cylinder"(기본, 위 tank_radius_m 사용)
+    # | "rect"(정사각 단면, tank_side_m 사용, compute_slosh_modes_rect 참조).
+    # 실물 HW 스타일의 zv_hw_freq_hz=2.00Hz는 실물의 사각탱크(11x11cm,
+    # 350mL)에서 잰 값이라, 이 시뮬레이션의 원통 탱크(f1=2.877Hz, 44% 오차)
+    # 보다 "rect" 모드(11cm, fill_height_m=0.02893 로 같이 설정 시 f1=2.194Hz,
+    # 9.7% 오차)가 실물과 훨씬 가깝다. 9.7% 오차는 실물 짐벌 자체의
+    # 기계적 유격/탄성 때문(ino 주석 실측 기록)이라 탱크 형상으로는 더
+    # 못 줄인다. 기본값은 "cylinder"라 안 건드리면 기존 동작과 동일하다.
+    tank_shape: str = "cylinder"
+    tank_side_m: float = 0.11         # 실물 탱크 한 변 실측값. tank_shape="rect"일 때만 사용
     # 주파수 갱신 시 구/신 셰이퍼 출력을 이 시간 동안 교차 혼합해 불연속을 막는다.
     zv_crossfade_s: float = 0.20
 
@@ -229,6 +249,69 @@ class CoreConfig:
     enable_zv: bool = True               # Convolved ZV 입력성형
     enable_gain_scheduling: bool = True  # False면 kp_max 고정
     enable_trim: bool = True             # 트레이 IMU 절대각 보정
+
+    # -------------------------------------------------------------------
+    # HW 스타일 경로 (실물 Liquid_Control_Robot, zv_shaping_rtos.ino 실측값)
+    # enable_hw_style=False(기본)면 위 경로가 그대로 쓰인다. True면 아래
+    # 값들로 _compute_hw_style()이 실행된다. 2026-09-04/05 실측 확정.
+    # -------------------------------------------------------------------
+    enable_hw_style: bool = False
+
+    # 합력·수평 게인 (zv_shaping_rtos.ino 183, 279행 [g]/[ag])
+    gain_horiz: float = 1.00     # GAIN — 차체 기울기를 몇 % 상쇄할지
+    gain_accel: float = 1.00     # ACC_GAIN — 합력 목표각을 얼마나 적용할지
+    # 3축 합력벡터 저역통과 (281행 [ad] ACC_LPF). 각도가 아니라 벡터를 거른다.
+    force_lpf_alpha: float = 0.20
+    # 합력 목표각 부호. 실측 확정이나(DIR_ACC, 280행) IMU 장착 방향에 종속.
+    # TODO: 실측 필요 — 시뮬레이션 IMU 장착 방향 기준으로 재확인 전까지 +1 가정.
+    dir_accel: float = 1.0
+
+    # 각도 상한 (184, 286, 397행 — 명령 없음, 코드에만 있는 값)
+    cmd_limit_rad: float = math.radians(45.0)       # LIMIT_DEG, 기구 한계
+    acc_ref_limit_rad: float = math.radians(45.0)   # ACC_REF_LIMIT, θ_ref 상한 = 1.0g
+    act_limit_rad: float = math.radians(55.0)       # ACT_LIMIT_DEG, 폭주 FAULT 문턱
+
+    # 지령 응답 (185, 187행 [r]/[f]). 150은 motor_test_MIT.ino의 별개
+    # 오픈루프 스윕 테스트 상한(SWEEP_RATE_MAX)이며 여기 슬루값이 아니다.
+    cmd_slew_rads: float = math.radians(120.0)  # MAX_RATE 실측 확정 120°/s
+    cmd_lpf_alpha: float = 0.30                 # CMD_LPF 실측 확정. 0.35부터 3.85Hz 진동
+
+    # ZV 입력성형 — 고정 주파수 단일 모드 (348~351행 [zv]/[zf]/[zm]).
+    # 시뮬레이션 기존 ConvolvedZV(2모드, 감쇠비 slosh_damping_ratio)와는 별개 경로.
+    enable_zv_hw: bool = True
+    zv_hw_freq_hz: float = 2.00   # 실측 확정. 11x11cm 350mL, 카트 위 고정 트레이 실측
+    # 실물 기본 ZV_ZETA=0.02이지만, 고정주파수 단일모드 포팅은 지시에 따라
+    # zeta≈0으로 가정한다(slosh_damping_ratio는 이 계산에 쓰지 않는다).
+    zv_hw_zeta: float = 0.0
+    zv_hw_mode: int = 2           # 2=ZV(2임펄스), 3=ZVD(3임펄스)
+
+    # 가속 종료 소프트복귀 (362~376행 [sr]/[sra]/[sre]/[srd]/[srh]/[srr]).
+    # 켜지면 ZV(HW 경로 한정)는 자동 OFF — 둘 다 "잔류 흔들림 억제"가 목적이라 중복 금지.
+    enable_soft_return: bool = False
+    soft_return_active_deg: float = 1.50
+    soft_return_end_deg: float = 0.75
+    soft_return_dwell_ms: float = 30
+    soft_return_hold_ms: float = 100
+    soft_return_return_ms: float = 120
+
+    # 모터 임피던스·피드포워드 (231~234, 261~263행). Gazebo는 계속 위치
+    # PID로 구동되므로 이 값들은 명령을 만들지 않는다 — ControlOutput의
+    # 진단 필드(ff_velocity_rads/ff_torque_nm)로만 노출해 실물 로그와
+    # 비교하는 데 쓴다.
+    motor_kp_pitch: float = 4.0    # 안쪽축(0x02) 실측 확정
+    motor_kd_pitch: float = 0.20
+    motor_kp_roll: float = 2.0     # 바깥축(0x01) — 실물에서도 "올려야 할 쪽"으로 기록됨
+    motor_kd_roll: float = 0.13
+    motor_ff_j_pitch: float = 0.0038   # kg·m², 안쪽 관성 실측 (Kp4/Kd0.2 로그 3개 회귀)
+    motor_ff_j_roll: float = 0.0       # 바깥 관성 미측정 → 0 (v_des만 적용됨)
+    motor_ff_tmax_nm: float = 1.5
+
+    # 참고: 실물의 REJ_RUN_FAULT(피드백/IMU 무보정 연속 카운트, 442행)와
+    # 피드백 타임아웃은 기존 CoreConfig의 accel_fault_debounce_frames(=3)와
+    # feedback_timeout_ms(=100)가 이미 두 경로 공통으로 처리한다(사용자
+    # 지시 "실물 안전값: ... 이미 있음" 참조) — HW 경로 전용 필드를 새로
+    # 두지 않았다. HW 경로에서 유일하게 새로 필요한 것은 act_limit_rad
+    # (실측 위치 한계) FAULT뿐이다.
 
 
 # ---------------------------------------------------------------------------
@@ -320,6 +403,29 @@ def compute_slosh_modes(radius_m, fill_height_m):
     f = []
     for lam in BESSEL_ROOTS:
         w = math.sqrt((lam * GRAVITY / radius_m) * math.tanh(lam * fill_height_m / radius_m))
+        f.append(w / (2.0 * math.pi))
+    return f[0], f[1]
+
+
+def compute_slosh_modes_rect(side_m, fill_height_m):
+    """직육면체(정사각 단면) 탱크의 (f1_hz, f2_hz).
+
+    w_n^2 = (n*pi*g / L) * tanh(n*pi*h / L)   (선형 소진폭 이론 1차/2차 모드)
+
+    실물 zv_shaping_rtos.ino 주석(342~346행)에 이미 이 식이 명시돼 있다.
+    실물 탱크(11x11cm, 350mL -> h=350e-6/0.11^2=28.93mm)를 대입하면
+    f1=2.194Hz가 나오는데, 같은 주석의 "책상 계산값 2.19"와 일치해
+    이 식과 실물 치수 둘 다 검증된다(실측 2.00Hz와의 9% 차는 짐벌
+    자체의 기계적 유격/탄성 때문이라고 ino 주석에 이미 설명돼 있다 —
+    탱크 형상 오차가 아니다).
+
+    베셀 근(BESSEL_ROOTS) 대신 n*pi(n=1,2)를 쓰는 것 말고는
+    compute_slosh_modes()와 구조가 같다.
+    """
+    f = []
+    for n in (1, 2):
+        w = math.sqrt((n * math.pi * GRAVITY / side_m) *
+                      math.tanh(n * math.pi * fill_height_m / side_m))
         f.append(w / (2.0 * math.pi))
     return f[0], f[1]
 
@@ -638,6 +744,177 @@ class GainSchedule:
 
 
 # ---------------------------------------------------------------------------
+# HW 스타일 경로 — 실물 zv_shaping_rtos.ino 이식 (enable_hw_style 전용)
+# ---------------------------------------------------------------------------
+
+def hw_force_vector_angle(ax, ay, az):
+    """비력 벡터(가속도계 읽음값) -> (pitch, roll) 각.
+
+    실물 force_pitch/force_roll 식 그대로(atan2, 481~497행 resultant_normal_body와
+    동일 계열이지만 여기서는 3축 성분을 먼저 저역통과한 뒤 넘겨받는다는 점이 다르다).
+    """
+    pitch = math.atan2(ay, math.hypot(ax, az))
+    roll = math.atan2(-ax, math.hypot(ay, az))
+    return pitch, roll
+
+
+def slew_rate_limit(target, prev, max_step):
+    """실물 slew() 그대로. 한 스텝에 낼 수 있는 최대 변화량으로 자른다."""
+    d = target - prev
+    if d > max_step:
+        d = max_step
+    elif d < -max_step:
+        d = -max_step
+    return prev + d
+
+
+class FixedFreqZV:
+    """고정 주파수 단일 모드 ZV/ZVD (실물 zvRecalc()/ZV 성형 그대로).
+
+    시뮬레이션 기존 ConvolvedZV(2모드, 감쇠비 기반)와 달리 축 1개·모드 1개다.
+    zeta=0 가정이면 ZV 진폭은 정확히 [0.5, 0.5], ZVD는 [0.25, 0.5, 0.25]다.
+    """
+
+    def __init__(self):
+        self.buf = [0.0] * ZV_BUFFER_SIZE
+        self.head = 0
+        self.n1 = 1
+        self.amps = (0.5, 0.5, 0.0)  # (A1, A2, A3). A3=0이면 ZV(2임펄스)
+
+    def configure(self, freq_hz, zeta, mode, dt_s):
+        """실측 확정 상수로 반주기 지연·진폭을 다시 계산한다."""
+        z = clamp(zeta, 0.0, 0.9)
+        wd = math.sqrt(1.0 - z * z)
+        k = math.exp(-z * math.pi / wd) if wd > 1e-9 else 0.0
+        td_half = 1.0 / (freq_hz * wd) * 0.5 if freq_hz > 0.0 and wd > 1e-9 else dt_s
+
+        max_n = (ZV_BUFFER_SIZE - 1) // 2 if mode == 3 else (ZV_BUFFER_SIZE - 1)
+        self.n1 = int(clamp(round(td_half / dt_s), 1, max_n))
+
+        if mode == 3:
+            denom = (1.0 + k) ** 2
+            self.amps = (1.0 / denom, 2.0 * k / denom, (k * k) / denom)
+        else:
+            self.amps = (1.0 / (1.0 + k), k / (1.0 + k), 0.0)
+
+    def clear(self):
+        for i in range(ZV_BUFFER_SIZE):
+            self.buf[i] = 0.0
+        self.head = 0
+
+    def apply(self, target):
+        self.head = (self.head + 1) % ZV_BUFFER_SIZE
+        self.buf[self.head] = target
+        i1 = (self.head - self.n1 + ZV_BUFFER_SIZE) % ZV_BUFFER_SIZE
+        i2 = (self.head - 2 * self.n1 + ZV_BUFFER_SIZE) % ZV_BUFFER_SIZE
+        a1, a2, a3 = self.amps
+        return a1 * self.buf[self.head] + a2 * self.buf[i1] + a3 * self.buf[i2]
+
+
+class SoftReturnPhase:
+    DIRECT = "DIRECT"
+    CONFIRM = "CONFIRM"
+    HOLD = "HOLD"
+    RETURN = "RETURN"
+    LEVEL = "LEVEL"
+
+
+def _ms_to_ticks(ms, dt_s):
+    ticks = int(math.ceil((ms * 1e-3) / dt_s - 1e-9))
+    return max(1, ticks)
+
+
+class SoftReturnAxis:
+    """실물 SoftReturnAxis/softReturnStep() 그대로 (622~700행).
+
+    가속 종료 시 잔류 목표각을 srh만큼 유지한 뒤 최소저크 곡선으로 srr 동안
+    0으로 복귀시켜, 급정지가 새 슬로싱을 만드는 것을 줄인다. ZV와 목적이
+    겹치므로 동시에 쓰지 않는다(호출자가 상호배타를 보장해야 한다).
+    """
+
+    def __init__(self):
+        self.phase = SoftReturnPhase.DIRECT
+        self.saw_active = False
+        self.quiet_ticks = 0
+        self.phase_ticks = 0
+        self.hold_angle = 0.0
+        self.last_active_angle = 0.0
+
+    def reset(self):
+        self.__init__()
+
+    def step(self, ref, raw_ref, active_deg, end_deg, dwell_ms, hold_ms, return_ms, dt_s):
+        active_rad = math.radians(active_deg)
+        end_rad = math.radians(end_deg)
+        dwell_ticks = _ms_to_ticks(dwell_ms, dt_s)
+        hold_ticks = _ms_to_ticks(hold_ms, dt_s)
+        return_ticks = _ms_to_ticks(return_ms, dt_s)
+        a = abs(raw_ref)
+
+        if self.phase != SoftReturnPhase.DIRECT and a >= active_rad:
+            self.reset()
+            self.saw_active = True
+            self.last_active_angle = ref
+            return ref
+
+        if self.phase == SoftReturnPhase.DIRECT:
+            if a >= active_rad:
+                self.saw_active = True
+                self.quiet_ticks = 0
+                self.last_active_angle = ref
+            elif self.saw_active:
+                if a > end_rad:
+                    self.last_active_angle = ref
+                else:
+                    self.phase = SoftReturnPhase.CONFIRM
+                    self.phase_ticks = 0
+                    self.hold_angle = self.last_active_angle
+                    if abs(self.hold_angle) < math.radians(0.15):
+                        self.phase = SoftReturnPhase.LEVEL
+                        self.saw_active = False
+                    return self.hold_angle
+            return ref
+
+        if self.phase == SoftReturnPhase.CONFIRM:
+            if a > end_rad:
+                self.phase = SoftReturnPhase.DIRECT
+                self.phase_ticks = 0
+                self.last_active_angle = ref
+                return ref
+            self.phase_ticks += 1
+            if self.phase_ticks >= dwell_ticks:
+                self.phase = SoftReturnPhase.HOLD
+                self.phase_ticks = 0
+            return self.hold_angle
+
+        if self.phase == SoftReturnPhase.HOLD:
+            self.phase_ticks += 1
+            if self.phase_ticks >= hold_ticks:
+                self.phase = SoftReturnPhase.RETURN
+                self.phase_ticks = 0
+            return self.hold_angle
+
+        if self.phase == SoftReturnPhase.RETURN:
+            if self.phase_ticks < return_ticks:
+                self.phase_ticks += 1
+            x = clamp(self.phase_ticks / float(return_ticks), 0.0, 1.0)
+            smooth = x * x * x * (10.0 + x * (-15.0 + 6.0 * x))
+            out = self.hold_angle * (1.0 - smooth)
+            if self.phase_ticks >= return_ticks:
+                self.phase = SoftReturnPhase.LEVEL
+                self.saw_active = False
+                self.hold_angle = 0.0
+                out = 0.0
+            return out
+
+        # LEVEL
+        if a >= active_rad:
+            self.reset()
+            self.saw_active = True
+        return ref
+
+
+# ---------------------------------------------------------------------------
 # 진단 — 어댑터가 로깅할 내부 상태
 # ---------------------------------------------------------------------------
 
@@ -668,6 +945,17 @@ class Diagnostics:
     slosh_freq_source: str = "config"  # "config" | "estimator"
     dt_s: float = 0.0
     cycle_faults: int = 0
+
+    # --- HW 스타일 경로 전용 (enable_hw_style=False면 전부 기본값 유지) ---
+    hw_style_active: bool = False
+    force_roll_rad: float = 0.0        # 3축 LPF 후 합력벡터 각(θ_force)
+    force_pitch_rad: float = 0.0
+    raw_ref_roll_rad: float = 0.0      # LPF 전, 소프트복귀 문턱 판정용
+    raw_ref_pitch_rad: float = 0.0
+    hw_shaped_roll_rad: float = 0.0    # ZV 또는 소프트복귀 통과 후
+    hw_shaped_pitch_rad: float = 0.0
+    soft_return_phase_roll: str = "DIRECT"
+    soft_return_phase_pitch: str = "DIRECT"
 
 
 # ---------------------------------------------------------------------------
@@ -716,11 +1004,47 @@ class ControlCore:
         self._cycle_faults = 0
         self._accel_fault_count = 0
 
-        self._fixed_f1_hz, self._fixed_f2_hz = compute_slosh_modes(
-            c.tank_radius_m, c.fill_height_m)
+        if c.tank_shape == "rect":
+            self._fixed_f1_hz, self._fixed_f2_hz = compute_slosh_modes_rect(
+                c.tank_side_m, c.fill_height_m)
+        else:
+            self._fixed_f1_hz, self._fixed_f2_hz = compute_slosh_modes(
+                c.tank_radius_m, c.fill_height_m)
         self._f1_hz = self._fixed_f1_hz
         self._f2_hz = self._fixed_f2_hz
         self._freq_source = "config"
+
+        # --- HW 스타일 경로 상태 (enable_hw_style=False면 그냥 미사용) ---
+        # 실물 force_ax/ay/az 그대로: 고정 dt를 가정한 매 틱 지수평활
+        # (force_ax = ACC_LPF*ax + (1-ACC_LPF)*force_ax, 1490~1492행).
+        # LowPass1Pole은 dt에 맞춰 계수를 다시 계산하는 RC필터라 여기서는
+        # 쓰지 않는다 — 실물과 다른 필터가 된다.
+        self._force_ax = 0.0
+        self._force_ay = 0.0
+        self._force_az = 1.0
+        # 실물 자체 상보필터 상태(θ_base). 시뮬레이션 기존 ComplementaryFilter는
+        # R=Ry(pitch)*Rx(roll) 닫힌형 분해를 쓰는데, 실물은 두 축을 독립
+        # 스칼라로 다루는 근사식(atan2(ay,·)=pitch, atan2(-ax,·)=roll)이다.
+        # 두 식은 소각도에서만 일치하고 축 정의 자체가 다르므로, force-vector
+        # 식(θ_base − θ_force)이 의도대로 상쇄되려면 θ_base도 반드시 같은
+        # 실물 식으로 구해야 한다 — 기존 ComplementaryFilter를 재사용하지 않는다.
+        self._hw_base_pitch = 0.0
+        self._hw_base_roll = 0.0
+        self._hw_base_initialized = False
+        self.zv_hw_roll = FixedFreqZV()
+        self.zv_hw_pitch = FixedFreqZV()
+        self.zv_hw_roll.configure(c.zv_hw_freq_hz, c.zv_hw_zeta, c.zv_hw_mode, c.nominal_dt_s)
+        self.zv_hw_pitch.configure(c.zv_hw_freq_hz, c.zv_hw_zeta, c.zv_hw_mode, c.nominal_dt_s)
+        self.soft_return_roll = SoftReturnAxis()
+        self.soft_return_pitch = SoftReturnAxis()
+        self._hw_cmd_lpf_roll = 0.0
+        self._hw_cmd_lpf_pitch = 0.0
+        self._hw_cmd_roll = 0.0
+        self._hw_cmd_pitch = 0.0
+        self._hw_ff_vel_roll = 0.0
+        self._hw_ff_vel_pitch = 0.0
+        self._hw_ff_acc_roll = 0.0
+        self._hw_ff_acc_pitch = 0.0
 
     # -- 초기화 ------------------------------------------------------------
 
@@ -743,6 +1067,23 @@ class ControlCore:
         self._f2_hz = self._fixed_f2_hz
         self._freq_source = "config"
 
+        self._force_ax, self._force_ay, self._force_az = 0.0, 0.0, 1.0
+        self._hw_base_pitch = 0.0
+        self._hw_base_roll = 0.0
+        self._hw_base_initialized = False
+        self.zv_hw_roll.configure(c.zv_hw_freq_hz, c.zv_hw_zeta, c.zv_hw_mode, c.nominal_dt_s)
+        self.zv_hw_pitch.configure(c.zv_hw_freq_hz, c.zv_hw_zeta, c.zv_hw_mode, c.nominal_dt_s)
+        self.soft_return_roll.reset()
+        self.soft_return_pitch.reset()
+        self._hw_cmd_lpf_roll = 0.0
+        self._hw_cmd_lpf_pitch = 0.0
+        self._hw_cmd_roll = 0.0
+        self._hw_cmd_pitch = 0.0
+        self._hw_ff_vel_roll = 0.0
+        self._hw_ff_vel_pitch = 0.0
+        self._hw_ff_acc_roll = 0.0
+        self._hw_ff_acc_pitch = 0.0
+
         ok_r = self.zv_roll.configure(self._f1_hz, self._f2_hz,
                                       c.slosh_damping_ratio, c.nominal_dt_s,
                                       immediate=True)
@@ -756,6 +1097,10 @@ class ControlCore:
     def reset_zv(self):
         self.zv_roll.reset(0.0)
         self.zv_pitch.reset(0.0)
+        self.zv_hw_roll.clear()
+        self.zv_hw_pitch.clear()
+        self.soft_return_roll.reset()
+        self.soft_return_pitch.reset()
 
     def request_activate(self):
         """READY -> ACTIVE 전환 요청. 자동 전환은 금지되어 있다."""
@@ -911,7 +1256,7 @@ class ControlCore:
             return self._disabled_output()
 
         # --- ACTIVE: 제어 계산 ---
-        return self._compute(imu, dt_s)
+        return self._compute(imu, dt_s, mx, my)
 
     # -- 내부 ---------------------------------------------------------------
 
@@ -924,7 +1269,11 @@ class ControlCore:
         d.tray_roll_rad = self.tray_filter.roll_rad - self.cfg.tray_zero_offset_roll_rad
         d.tray_pitch_rad = self.tray_filter.pitch_rad - self.cfg.tray_zero_offset_pitch_rad
 
-    def _compute(self, imu: ImuPair, dt_s: float) -> ControlOutput:
+    def _compute(self, imu: ImuPair, dt_s: float,
+                 mx: MotorFeedback = None, my: MotorFeedback = None) -> ControlOutput:
+        if self.cfg.enable_hw_style:
+            return self._compute_hw_style(imu, dt_s, mx, my)
+
         c = self.cfg
         d = self.diag
 
@@ -1013,6 +1362,140 @@ class ControlCore:
             y_position_rad=clamp(ff_pitch + trim_pitch, -lim, lim),
             max_velocity_rads=c.max_velocity_rads,
             enable=True,
+        )
+
+    def _compute_hw_style(self, imu: ImuPair, dt_s: float,
+                           mx: MotorFeedback, my: MotorFeedback) -> ControlOutput:
+        """실물 ctrlTask() 그대로 (zv_shaping_rtos.ino 1477~1628행).
+
+        base IMU만 쓴다(실물에는 tray IMU가 없다). tray_filter는 로깅
+        일관성을 위해 _update_estimates()에서 계속 갱신되지만 이 경로는
+        읽지 않는다.
+        """
+        c = self.cfg
+        d = self.diag
+        d.hw_style_active = True
+
+        # 실측 위치 한계 FAULT — 실물 drainCAN() 397/1057~1062행 그대로.
+        # 지령은 절대 cmd_limit_rad(45°)를 넘지 않으므로, 측정 위치가
+        # act_limit_rad(55°)를 넘으면 우리가 시킨 움직임이 아니다.
+        if mx is not None and my is not None and mx.valid and my.valid:
+            if abs(mx.position_rad) > c.act_limit_rad or abs(my.position_rad) > c.act_limit_rad:
+                return self._to_fault("위치 한계 초과 (ACT_LIMIT)")
+
+        # 1) 상보필터로 차체 절대 자세 θ_base — 실물 자체 식 그대로
+        # (1481~1516행). 시뮬레이션 기존 ComplementaryFilter(R=Ry*Rx 닫힌형
+        # 분해)는 축 정의가 달라 여기서 쓰면 안 된다(클래스 상단 주석 참조).
+        # gx->pitch rate, gy->roll rate인 것도 실물 그대로(레지스터 배정,
+        # 1481~1482행) — REP-103 사용자 기대와 다를 수 있어 TODO로 남긴다.
+        # TODO: 실측 필요 — 시뮬레이션 IMU 축과 실물 gx/gy 배정이 일치하는지.
+        s = imu.base
+        pitch_acc = math.atan2(s.ay_mps2, math.hypot(s.ax_mps2, s.az_mps2))
+        roll_acc = math.atan2(-s.ax_mps2, math.hypot(s.ay_mps2, s.az_mps2))
+
+        if not self._hw_base_initialized:
+            self._hw_base_pitch = pitch_acc
+            self._hw_base_roll = roll_acc
+            self._hw_base_initialized = True
+        else:
+            rate_pitch = s.gx_rads
+            rate_roll = s.gy_rads
+            ab = c.alpha_base
+            self._hw_base_pitch = ab * (self._hw_base_pitch + rate_pitch * dt_s) + (1.0 - ab) * pitch_acc
+            self._hw_base_roll = ab * (self._hw_base_roll + rate_roll * dt_s) + (1.0 - ab) * roll_acc
+        theta_base_pitch = self._hw_base_pitch
+        theta_base_roll = self._hw_base_roll
+        d.base_roll_rad = theta_base_roll
+        d.base_pitch_rad = theta_base_pitch
+
+        # tray_filter는 제어에 쓰지 않지만 CSV 로깅 컬럼(tray_roll_deg 등)이
+        # 두 경로에서 같은 의미를 유지하도록 계속 갱신해둔다.
+        self.tray_filter.update(imu.tray, dt_s)
+        d.tray_roll_rad = self.tray_filter.roll_rad - self.cfg.tray_zero_offset_roll_rad
+        d.tray_pitch_rad = self.tray_filter.pitch_rad - self.cfg.tray_zero_offset_pitch_rad
+
+        # 3축 합력벡터를 성분 상태로 저역통과(ACC_LPF) 한 뒤 한 번만 각도로
+        # 바꾼다 — 축별로 각도를 따로 거르면 두 축이 동시에 움직일 때 벡터
+        # 길이·방향이 어긋난다 (1487~1494행 주석 그대로).
+        a = c.force_lpf_alpha
+        self._force_ax = a * s.ax_mps2 + (1.0 - a) * self._force_ax
+        self._force_ay = a * s.ay_mps2 + (1.0 - a) * self._force_ay
+        self._force_az = a * s.az_mps2 + (1.0 - a) * self._force_az
+        force_pitch, force_roll = hw_force_vector_angle(
+            self._force_ax, self._force_ay, self._force_az)
+        d.force_pitch_rad, d.force_roll_rad = force_pitch, force_roll
+
+        # 3) 합력 목표각. want = ACC_GAIN*ref - GAIN*theta_base, ref = theta_base - theta_force
+        # 이므로 GAIN=ACC_GAIN일 때 theta_base가 대수적으로 소거된다(1536~1550행 주석).
+        dir_acc = c.dir_accel
+        raw_ref_pitch = clamp((theta_base_pitch - pitch_acc) * dir_acc,
+                              -c.acc_ref_limit_rad, c.acc_ref_limit_rad)
+        raw_ref_roll = clamp((theta_base_roll - roll_acc) * dir_acc,
+                             -c.acc_ref_limit_rad, c.acc_ref_limit_rad)
+        ref_pitch = clamp((theta_base_pitch - force_pitch) * dir_acc,
+                          -c.acc_ref_limit_rad, c.acc_ref_limit_rad)
+        ref_roll = clamp((theta_base_roll - force_roll) * dir_acc,
+                         -c.acc_ref_limit_rad, c.acc_ref_limit_rad)
+        d.raw_ref_pitch_rad, d.raw_ref_roll_rad = raw_ref_pitch, raw_ref_roll
+
+        # 연속 데드밴드 — 실물에는 없으나 사용자 지시로 기존 시뮬 데드밴드를
+        # 재사용한다(모터 떨림 억제 목적은 동일).
+        ref_pitch = apply_deadband(ref_pitch, c.deadband_pitch_rad)
+        ref_roll = apply_deadband(ref_roll, c.deadband_roll_rad)
+
+        # 3.5) ZV 입력성형 또는 소프트복귀 — 상호배타(실물 sr1이면 zv 자동 OFF)
+        if c.enable_soft_return:
+            shaped_pitch = self.soft_return_pitch.step(
+                ref_pitch, raw_ref_pitch, c.soft_return_active_deg, c.soft_return_end_deg,
+                c.soft_return_dwell_ms, c.soft_return_hold_ms, c.soft_return_return_ms, dt_s)
+            shaped_roll = self.soft_return_roll.step(
+                ref_roll, raw_ref_roll, c.soft_return_active_deg, c.soft_return_end_deg,
+                c.soft_return_dwell_ms, c.soft_return_hold_ms, c.soft_return_return_ms, dt_s)
+            d.soft_return_phase_pitch = self.soft_return_pitch.phase
+            d.soft_return_phase_roll = self.soft_return_roll.phase
+        elif c.enable_zv_hw:
+            shaped_pitch = self.zv_hw_pitch.apply(ref_pitch)
+            shaped_roll = self.zv_hw_roll.apply(ref_roll)
+        else:
+            shaped_pitch, shaped_roll = ref_pitch, ref_roll
+        d.hw_shaped_pitch_rad, d.hw_shaped_roll_rad = shaped_pitch, shaped_roll
+
+        # 4) 제어  motor_cmd = ACC_GAIN*ref - GAIN*theta_base
+        want_pitch = clamp(c.gain_accel * shaped_pitch - c.gain_horiz * theta_base_pitch,
+                           -c.cmd_limit_rad, c.cmd_limit_rad)
+        want_roll = clamp(c.gain_accel * shaped_roll - c.gain_horiz * theta_base_roll,
+                          -c.cmd_limit_rad, c.cmd_limit_rad)
+
+        self._hw_cmd_lpf_pitch = c.cmd_lpf_alpha * want_pitch + (1.0 - c.cmd_lpf_alpha) * self._hw_cmd_lpf_pitch
+        self._hw_cmd_lpf_roll = c.cmd_lpf_alpha * want_roll + (1.0 - c.cmd_lpf_alpha) * self._hw_cmd_lpf_roll
+
+        max_step = c.cmd_slew_rads * dt_s
+        prev_pitch, prev_roll = self._hw_cmd_pitch, self._hw_cmd_roll
+        self._hw_cmd_pitch = slew_rate_limit(self._hw_cmd_lpf_pitch, self._hw_cmd_pitch, max_step)
+        self._hw_cmd_roll = slew_rate_limit(self._hw_cmd_lpf_roll, self._hw_cmd_roll, max_step)
+
+        # MIT 피드포워드(v_des, t_ff) — 진단 전용, Gazebo 구동에는 쓰이지 않는다.
+        if dt_s > 0.0:
+            vp = (self._hw_cmd_pitch - prev_pitch) / dt_s
+            vr = (self._hw_cmd_roll - prev_roll) / dt_s
+            self._hw_ff_acc_pitch = (vp - self._hw_ff_vel_pitch) / dt_s
+            self._hw_ff_acc_roll = (vr - self._hw_ff_vel_roll) / dt_s
+            self._hw_ff_vel_pitch, self._hw_ff_vel_roll = vp, vr
+        ff_torque_pitch = clamp(c.motor_ff_j_pitch * self._hw_ff_acc_pitch,
+                                -c.motor_ff_tmax_nm, c.motor_ff_tmax_nm)
+        ff_torque_roll = clamp(c.motor_ff_j_roll * self._hw_ff_acc_roll,
+                               -c.motor_ff_tmax_nm, c.motor_ff_tmax_nm)
+
+        d.state = self.state
+        return ControlOutput(
+            x_position_rad=self._hw_cmd_roll,
+            y_position_rad=self._hw_cmd_pitch,
+            max_velocity_rads=c.max_velocity_rads,
+            enable=True,
+            ff_velocity_roll_rads=self._hw_ff_vel_roll,
+            ff_velocity_pitch_rads=self._hw_ff_vel_pitch,
+            ff_torque_roll_nm=ff_torque_roll,
+            ff_torque_pitch_nm=ff_torque_pitch,
         )
 
     def _disabled_output(self) -> ControlOutput:

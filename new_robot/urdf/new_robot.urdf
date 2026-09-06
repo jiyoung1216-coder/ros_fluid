@@ -26,7 +26,20 @@
                  봤더니 이번엔 진동(오버슈트)해서, 대신 p_gain만 올려
                  중력을 버틸 강성을 확보했다. d_gain은 p 대비 원래 비율
                  (0.05)을 유지. p=20,d=1.5였던 이전 임의값보다는 훨씬
-                 부드럽다. -->
+                 부드럽다.
+
+                 2026-09-05 실험 기록 - tray_pitch_deg가 정지 상태에서도
+                 계속 약 -3.4도(roll은 -0.76도)에 고정되는 현상을 발견해
+                 처음엔 이 PID의 중력 처짐(정상상태 오차)으로 의심하고
+                 p_gain을 3배(15->45, d_gain도 비례해 2.25)로 올려 재측정
+                 했는데 값이 전혀 안 줄었다(-3.39도로 거의 동일). 게인에
+                 비례하지 않는 걸 보면 토크 처짐이 아니라 조인트 각도 0과
+                 트레이(water_tank) 실제 수평 사이의 고정 기하 오프셋으로
+                 보여 원래 게인(15/0.75)으로 되돌렸다. 실제 보정은
+                 sim_control의 tray_zero_offset_roll_rad/pitch_rad
+                 (gimbal_control_core.py CoreConfig)로 하는 게 맞다 — 그
+                 필드가 정확히 이 목적("조인트각 0이 트레이 수평과
+                 일치하지 않는 만큼")으로 이미 존재한다. -->
             <plugin filename="gz-sim-joint-position-controller-system" name="gz::sim::systems::JointPositionController">
             <joint_name>revolute_1</joint_name>
             <topic>/gimbal_roll_cmd</topic>

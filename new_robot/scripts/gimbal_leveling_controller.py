@@ -2,6 +2,11 @@
 """
 gimbal_leveling_controller.py
 
+2026-09-05: 이 노드의 로직(ActivityGate/SloshEstimator1D 등)은
+sim_control/gimbal_control_core.py + sim_control/gimbal_leveling_controller.py로
+이전되었습니다(플랫폼 독립 코어 + 얇은 ROS2 어댑터 구조, HW 스타일 경로
+포함). 신규 실험은 그쪽을 사용하세요. 이 파일 삭제 여부는 보류 중입니다.
+
 pid_control_parkver/Control.cpp (ESP32 펌웨어)의 제어 알고리즘을
 ROS2(rclpy) + Gazebo Harmonic(gz sim) 시뮬레이션용으로 이식한 노드.
 

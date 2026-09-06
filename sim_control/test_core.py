@@ -16,9 +16,11 @@ import sys
 
 from gimbal_control_core import (
     GRAVITY, ComplementaryFilter, ControlCore, ControlOutput, ControlState,
-    ConvolvedZV, CoreConfig, GainSchedule, GimbalKinematics, ImuPair, ImuSample,
-    MotorFeedback, apply_deadband, attitude_matrix, compute_slosh_modes,
-    housner_pendulum, mat_col_z, normal_to_roll_pitch, resultant_normal_body,
+    ConvolvedZV, CoreConfig, FixedFreqZV, GainSchedule, GimbalKinematics,
+    ImuPair, ImuSample, MotorFeedback, SoftReturnAxis, SoftReturnPhase,
+    apply_deadband, attitude_matrix, compute_slosh_modes, compute_slosh_modes_rect,
+    housner_pendulum, hw_force_vector_angle, mat_col_z, normal_to_roll_pitch,
+    resultant_normal_body, slew_rate_limit,
 )
 
 DEG = math.pi / 180.0
@@ -225,6 +227,28 @@ def test_slosh_modes():
     f80, _ = compute_slosh_modes(0.080, 0.090)
     check("R=80mm -> f1 ~2.35Hz (원본 ZV 지연이 겨냥한 값)",
           close(f80, 2.354, 0.01), f"f1={f80:.4f}Hz")
+
+    # 사각탱크(compute_slosh_modes_rect) — 실물 탱크 실측값으로 검증.
+    # 11x11cm, 350mL -> h=28.93mm. 실물 zv_shaping_rtos.ino 주석의
+    # "책상 계산값 2.19"와 일치해야 한다(실측 2.00Hz와의 9%차는 짐벌
+    # 기계적 유격 때문이라고 그 주석에 이미 설명돼 있음. 탱크 형상 오차 아님).
+    h_real_tank = 350e-6 / (0.11 * 0.11)
+    f1r, f2r = compute_slosh_modes_rect(0.11, h_real_tank)
+    check("실물 사각탱크(11cm,350mL) 1차 모드 ~2.194Hz (ino 주석 '책상계산 2.19'와 일치)",
+          close(f1r, 2.194, 0.005), f"f1={f1r:.4f}Hz, h={h_real_tank*1000:.2f}mm")
+    check("사각탱크 2차 모드 > 1차", f2r > f1r, f"f2={f2r:.4f}Hz")
+
+    # ControlCore가 tank_shape="rect"를 실제로 반영하는지 (배선 확인)
+    cfg_rect = geometry_config(tank_shape="rect", tank_side_m=0.11,
+                               fill_height_m=h_real_tank)
+    core_rect = ControlCore(cfg_rect)
+    check("ControlCore tank_shape=rect 배선", close(core_rect._fixed_f1_hz, f1r, 1e-9),
+          f"core._fixed_f1_hz={core_rect._fixed_f1_hz:.4f}Hz")
+    # tank_shape 기본값(cylinder)은 기존 동작 그대로여야 한다 (회귀 확인)
+    cfg_default = geometry_config()
+    core_default = ControlCore(cfg_default)
+    check("ControlCore tank_shape 기본값은 cylinder(기존 동작 유지)",
+          close(core_default._fixed_f1_hz, f1, 1e-9))
 
 
 def test_zv():
@@ -549,6 +573,172 @@ def test_cnn_interface():
           and close(core._f1_hz, core._fixed_f1_hz, 1e-12))
 
 
+def hw_config(**kw):
+    """HW 스타일 경로 검증용 설정. require_motor_feedback=False는 어댑터
+    기본값과 동일(가제보 위치 컨트롤러가 피드백을 안 준다)."""
+    cfg = CoreConfig()
+    cfg.enable_hw_style = True
+    cfg.require_motor_feedback = False
+    for k, v in kw.items():
+        setattr(cfg, k, v)
+    return cfg
+
+
+def run_hw_core(core, base_att, steps, ax_w=0.0, ay_w=0.0, az_w=0.0, dt=0.01,
+                 motor_roll=None, motor_pitch=None):
+    """core(enable_hw_style=True)를 steps번 돌린다. tray는 실물에 없으므로
+    base와 같은 자세로 채워 로깅 일관성만 맞춘다(제어에는 안 쓰인다)."""
+    br, bp = base_att
+    out = ControlOutput()
+    t_us = 0
+    for _ in range(steps):
+        t_us += int(dt * 1e6)
+        t_ms = t_us // 1000
+        imu = ImuPair(
+            base=make_sample(br, bp, t_us, ax_w=ax_w, ay_w=ay_w, az_w=az_w),
+            tray=make_sample(br, bp, t_us, ax_w=ax_w, ay_w=ay_w, az_w=az_w),
+        )
+        mr = motor_roll if motor_roll is not None else make_motor(t_ms)
+        mp = motor_pitch if motor_pitch is not None else make_motor(t_ms)
+        out = core.step(imu, mr, mp, dt, t_us, t_ms)
+    return out
+
+
+def test_hw_style():
+    print("\n[13] HW 스타일 경로 (실물 zv_shaping_rtos.ino 포팅)")
+
+    # (a) 정지·수평 -> 목표각 0. ax=ay=0이면 force_pitch/roll이 LPF 상태와
+    # 무관하게 atan2(0,·)=0으로 즉시 0이 되고, theta_base도 첫 표본에서
+    # 가속도계 각으로 바로 초기화되어 역시 0이다.
+    core = ControlCore(hw_config())
+    core.init_control()
+    core.request_activate()
+    out = run_hw_core(core, (0.0, 0.0), 5)
+    check("정지·수평 -> 목표각 0",
+          close(out.x_position_rad, 0.0, 1e-9) and close(out.y_position_rad, 0.0, 1e-9),
+          f"roll={out.x_position_rad:.3e} pitch={out.y_position_rad:.3e}")
+
+    # (b) 합력벡터 각 공식 자체의 정확성 (hw_force_vector_angle, 실물
+    # force_pitch/force_roll 식 그대로: pitch<-ay, roll<-(-ax)). 축 하나만
+    # 가속도를 실어 90도 근방의 명확한 값으로 검증한다.
+    p, r = hw_force_vector_angle(0.0, 0.0, GRAVITY)
+    check("합력벡터각: 중력만 -> (0,0)", close(p, 0.0, 1e-9) and close(r, 0.0, 1e-9))
+    p, r = hw_force_vector_angle(GRAVITY, 0.0, 0.0)
+    check("합력벡터각: +ax만 -> roll=-90deg",
+          close(p, 0.0, 1e-9) and close(r, -math.pi / 2, 1e-9), f"roll={math.degrees(r):.3f}")
+    p, r = hw_force_vector_angle(0.0, GRAVITY, 0.0)
+    check("합력벡터각: +ay만 -> pitch=+90deg",
+          close(p, math.pi / 2, 1e-9) and close(r, 0.0, 1e-9), f"pitch={math.degrees(p):.3f}")
+
+    # (c) ZV 2.00Hz, zeta=0 -> 반주기 지연 샘플수. Td/2 = 0.5/(f*sqrt(1-z^2))
+    # = 0.5/2.00 = 0.25s = 25샘플(dt=0.01s). zeta=0이면 ZV 진폭 정확히
+    # [0.5,0.5], ZVD는 [0.25,0.5,0.25] (실물 zvRecalc() 그대로).
+    zv = FixedFreqZV()
+    zv.configure(2.00, 0.0, 2, 0.01)
+    check("ZV 2.00Hz zeta=0 -> 반주기 25샘플", zv.n1 == 25, f"n1={zv.n1}")
+    check("ZV(2임펄스) 진폭 [0.5,0.5,0.0]",
+          close(zv.amps[0], 0.5, 1e-9) and close(zv.amps[1], 0.5, 1e-9) and zv.amps[2] == 0.0,
+          f"amps={zv.amps}")
+    zv.configure(2.00, 0.0, 3, 0.01)
+    check("ZVD(3임펄스) 진폭 [0.25,0.5,0.25]",
+          close(zv.amps[0], 0.25, 1e-9) and close(zv.amps[1], 0.5, 1e-9) and close(zv.amps[2], 0.25, 1e-9),
+          f"amps={zv.amps}")
+
+    # (d) 소프트복귀 시퀀스 (실물 SoftReturnAxis 그대로).
+    # active=1.5deg, end=0.75deg, dwell=30ms(3틱) hold=100ms(10틱) return=120ms(12틱), dt=10ms.
+    sr = SoftReturnAxis()
+    active_deg, end_deg, dwell_ms, hold_ms, return_ms, dt = 1.5, 0.75, 30, 100, 120, 0.01
+    big = math.radians(5.0)
+    small = math.radians(0.5)
+
+    sr.step(big, big, active_deg, end_deg, dwell_ms, hold_ms, return_ms, dt)  # 1: DIRECT, 가속 인정
+    check("소프트복귀: 가속 인정 후에도 DIRECT 유지", sr.phase == SoftReturnPhase.DIRECT)
+    sr.step(small, small, active_deg, end_deg, dwell_ms, hold_ms, return_ms, dt)  # 2: 종료 감지 -> CONFIRM
+    check("소프트복귀: 종료 감지 -> CONFIRM", sr.phase == SoftReturnPhase.CONFIRM)
+    for _ in range(2):  # 3, 4: 아직 dwell 미달
+        sr.step(small, small, active_deg, end_deg, dwell_ms, hold_ms, return_ms, dt)
+    check("소프트복귀: dwell 중 -> 여전히 CONFIRM", sr.phase == SoftReturnPhase.CONFIRM)
+    sr.step(small, small, active_deg, end_deg, dwell_ms, hold_ms, return_ms, dt)  # 5: dwell 완료 -> HOLD
+    check("소프트복귀: dwell 완료 -> HOLD", sr.phase == SoftReturnPhase.HOLD)
+    for _ in range(9):  # 6..14
+        sr.step(small, small, active_deg, end_deg, dwell_ms, hold_ms, return_ms, dt)
+    check("소프트복귀: hold 중(9/10틱) -> 여전히 HOLD", sr.phase == SoftReturnPhase.HOLD)
+    sr.step(small, small, active_deg, end_deg, dwell_ms, hold_ms, return_ms, dt)  # 15: hold 완료 -> RETURN
+    check("소프트복귀: hold 완료 -> RETURN", sr.phase == SoftReturnPhase.RETURN)
+    for _ in range(11):  # 16..26
+        sr.step(small, small, active_deg, end_deg, dwell_ms, hold_ms, return_ms, dt)
+    check("소프트복귀: return 중(11/12틱) -> 여전히 RETURN", sr.phase == SoftReturnPhase.RETURN)
+    out_final = sr.step(small, small, active_deg, end_deg, dwell_ms, hold_ms, return_ms, dt)  # 27: 복귀 완료 -> LEVEL
+    check("소프트복귀: return 완료(27틱) -> LEVEL, 출력 0",
+          sr.phase == SoftReturnPhase.LEVEL and close(out_final, 0.0, 1e-9))
+
+    # (e) LIMIT 45도 클램프 & 슬루 120도/s.
+    # base는 수평(0,0)으로 두고 ay축에만 강한 가속(38 m/s^2)을 실어 비력
+    # 노름을 accel_norm_max(40) 이내로 유지하면서 raw pitch_acc가 75.5deg에
+    # 이르게 한다 — theta_base가 여기 직접 초기화되므로 클램프 전 want가
+    # 45deg를 크게 넘는다. 60틱(0.6s, 슬루로 최대 72deg까지 이동 가능한
+    # 시간)을 돌려 장기적으로도 상한을 벗어나지 않는지 확인한다.
+    core = ControlCore(hw_config())
+    core.init_control()
+    core.request_activate()
+    out = run_hw_core(core, (0.0, 0.0), 60, ax_w=0.0, ay_w=38.0)
+    limit = core.cfg.cmd_limit_rad
+    check("LIMIT 45도 클램프 준수 (0.6s 후에도)",
+          abs(out.y_position_rad) <= limit + 1e-6,
+          f"pitch={math.degrees(out.y_position_rad):.4f}deg (한계 {math.degrees(limit):.0f})")
+
+    # 슬루만 격리 검증: cmd_lpf_alpha=1.0(무필터)로 두면 LPF 출력이 곧
+    # 클램프된 목표와 같아지므로, 첫 틱의 실제 이동량은 순수 슬루 한계
+    # (cmd_slew_rads*dt)로만 결정된다.
+    core = ControlCore(hw_config(cmd_lpf_alpha=1.0))
+    core.init_control()
+    core.request_activate()
+    out = run_hw_core(core, (0.0, 0.0), 1, ax_w=0.0, ay_w=38.0, dt=0.01)
+    max_step = core.cfg.cmd_slew_rads * 0.01
+    check("슬루 120도/s -> 첫 틱 이동량이 슬루 한계와 일치",
+          close(abs(out.y_position_rad), max_step, 1e-9),
+          f"pitch={math.degrees(out.y_position_rad):.4f}deg, 한계={math.degrees(max_step):.4f}deg")
+
+    # slew_rate_limit() 자체도 직접 검증 (실물 slew() 그대로).
+    check("slew_rate_limit: 상한 클램프", close(slew_rate_limit(1.0, 0.0, 0.02), 0.02, 1e-12))
+    check("slew_rate_limit: 하한 클램프", close(slew_rate_limit(-1.0, 0.0, 0.02), -0.02, 1e-12))
+    check("slew_rate_limit: 한계 이내는 그대로", close(slew_rate_limit(0.005, 0.0, 0.02), 0.005, 1e-12))
+
+    # (f) FAULT 조건.
+    core = ControlCore(hw_config())
+    core.init_control()
+    core.request_activate()
+    run_hw_core(core, (0.0, 0.0), 1)  # ACTIVE 진입
+    check("FAULT 전 ACTIVE 상태 확인", core.state == ControlState.ACTIVE)
+    t_us = 100_000
+    for i in range(3):  # 가속도 이상(비력범위 밖) 연속 3프레임. 첫 2프레임은
+        # 아직 FAULT가 아니어야(디바운스) 진짜 3프레임 조건을 확인한다.
+        t_us += 10_000
+        # sampled_at_us를 매번 갱신해 IMU 타임아웃이 아니라 가속도 크기
+        # 이상만 걸리게 한다(비력 노름 0 << accel_norm_min=2).
+        bad = ImuSample(ax_mps2=0.0, ay_mps2=0.0, az_mps2=0.0,
+                        sampled_at_us=t_us, valid=True)
+        imu = ImuPair(base=bad, tray=bad)
+        core.step(imu, make_motor(t_us // 1000), make_motor(t_us // 1000),
+                  0.01, t_us, t_us // 1000)
+        if i < 2:
+            check(f"가속도 이상 {i+1}프레임째는 아직 FAULT 아님",
+                  core.state != ControlState.FAULT, f"state={int(core.state)}")
+    check("가속도 이상 연속 3프레임 -> FAULT",
+          core.state == ControlState.FAULT and core.diag.fault_reason == core.ACCEL_FAULT_MSG,
+          core.diag.fault_reason)
+
+    core = ControlCore(hw_config())
+    core.init_control()
+    core.request_activate()
+    run_hw_core(core, (0.0, 0.0), 1)
+    over_limit = MotorFeedback(position_rad=math.radians(60.0), valid=True,
+                               received_at_ms=1000, error_code=0)
+    out = run_hw_core(core, (0.0, 0.0), 1, motor_roll=over_limit, motor_pitch=make_motor(1010))
+    check("실측 위치 한계(55도) 초과 -> FAULT",
+          core.state == ControlState.FAULT and not out.enable, core.diag.fault_reason)
+
+
 def main():
     print("=" * 70)
     print("gimbal_control_core 단위 시험")
@@ -566,6 +756,7 @@ def main():
     test_integral_reduces_sustained_bias()
     test_deadband_in_loop()
     test_cnn_interface()
+    test_hw_style()
     print("\n" + "=" * 70)
     print(f"전체 통과: {_passed}개 검사")
     print("=" * 70)
