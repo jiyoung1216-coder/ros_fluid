@@ -172,6 +172,9 @@ class GimbalLevelingController(Node):
         # 다른 URDF/씬으로 바꾸면 diag 절차(README 참조)로 다시 재야 한다.
         p("tray_zero_offset_roll_rad", -0.025103)
         p("tray_zero_offset_pitch_rad", -0.055983)
+        # 2026-09-06: 실측으로 발견한 폐루프 버그 진단/수정용 플래그.
+        # gimbal_control_core.CoreConfig.apply_tray_zero_offset_in_error 참조.
+        p("apply_tray_zero_offset_in_error", True)
 
         # --- HW 스타일 경로 (실물 Liquid_Control_Robot 시리얼 튜닝 명령 대응) ---
         p("enable_hw_style", False)
@@ -238,6 +241,7 @@ class GimbalLevelingController(Node):
         cfg.require_motor_feedback = bool(g("require_motor_feedback"))
         cfg.tray_zero_offset_roll_rad = float(g("tray_zero_offset_roll_rad"))
         cfg.tray_zero_offset_pitch_rad = float(g("tray_zero_offset_pitch_rad"))
+        cfg.apply_tray_zero_offset_in_error = bool(g("apply_tray_zero_offset_in_error"))
 
         cfg.enable_hw_style = bool(g("enable_hw_style"))
         cfg.gain_horiz = float(g("gain_horiz"))

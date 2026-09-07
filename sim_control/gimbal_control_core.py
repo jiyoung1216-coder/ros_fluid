@@ -227,6 +227,16 @@ class CoreConfig:
     # 반드시 존재한다. 무부하 수평 상태에서 측정해 채운다.
     tray_zero_offset_roll_rad: float = 0.0
     tray_zero_offset_pitch_rad: float = 0.0
+    # 2026-09-06: tray_zero_offset를 "센서 읽음값"에서 빼서 오차 계산에 넣으면
+    # (기존 기본 동작), 트림 루프가 "이미 목표에 도달했다"고 착각해 실제
+    # 물리적 기울기(조립 오프셋)를 절대 상쇄하지 않는 버그를 실측으로 확인함
+    # (트레이 IMU가 짐벌이 아무 보정도 안 하는 상태에서도 base 대비 훨씬 큰
+    # 고정 잔류 기울기를 유지 — 폐루프가 그 물리적 오프셋을 못 지운다는 뜻).
+    # False로 두면 트림 오차 계산에 원시(raw) 트레이 읽음값을 그대로 써서
+    # 폐루프가 실제 물리적 기울기를 0으로 몰아간다(적분항이 있으면 반드시
+    # 수렴). 기본값 True로 기존 동작을 보존하고, 검증 후 필요하면 기본값을
+    # 바꾼다.
+    apply_tray_zero_offset_in_error: bool = True
 
     # --- 유효성 판정 ---
     sensor_timeout_us: int = 50_000     # 50ms. 100Hz 기준 5주기
@@ -1266,8 +1276,12 @@ class ControlCore:
         self.tray_filter.update(imu.tray, dt_s)
         d.base_roll_rad = self.base_filter.roll_rad
         d.base_pitch_rad = self.base_filter.pitch_rad
-        d.tray_roll_rad = self.tray_filter.roll_rad - self.cfg.tray_zero_offset_roll_rad
-        d.tray_pitch_rad = self.tray_filter.pitch_rad - self.cfg.tray_zero_offset_pitch_rad
+        if self.cfg.apply_tray_zero_offset_in_error:
+            d.tray_roll_rad = self.tray_filter.roll_rad - self.cfg.tray_zero_offset_roll_rad
+            d.tray_pitch_rad = self.tray_filter.pitch_rad - self.cfg.tray_zero_offset_pitch_rad
+        else:
+            d.tray_roll_rad = self.tray_filter.roll_rad
+            d.tray_pitch_rad = self.tray_filter.pitch_rad
 
     def _compute(self, imu: ImuPair, dt_s: float,
                  mx: MotorFeedback = None, my: MotorFeedback = None) -> ControlOutput:

@@ -4,6 +4,7 @@ import os
 from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription, SetEnvironmentVariable
+from launch.conditions import IfCondition
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import Command, LaunchConfiguration, PathJoinSubstitution
 from launch_ros.actions import Node
@@ -20,6 +21,12 @@ def generate_launch_description():
     # 기본값이 기존 하드코딩값('empty.sdf ')과 완전히 동일해 미지정 시
     # 기존 동작 그대로다 — 토픽 브릿지는 건드리지 않고 파라미터 인자만 추가.
     world_file_arg = DeclareLaunchArgument('world_file', default_value='empty.sdf ')
+    # 2026-09-06: 언덕 5개(hill_0~hill_4)+ramp_bridge는 world_file과 무관하게
+    # 아래 spawn_hills/spawn_ramp_bridge가 항상 별도로 스폰해왔다 — 1단계
+    # 벤치마크가 "완전 평지"를 의도했는데도 실제로는 언덕이 있는 채로
+    # 실행된 원인이 이것이었음(사용자가 Gazebo 화면에서 직접 발견).
+    # 기본값 true로 기존 동작을 100% 보존하고, 벤치마크에서만 false로 끈다.
+    spawn_terrain_arg = DeclareLaunchArgument('spawn_terrain', default_value='true')
     pkg_share = FindPackageShare('new_robot')
     urdf_path = PathJoinSubstitution([pkg_share, 'urdf', 'new_robot.urdf'])
     robot_description = {'robot_description': Command(['xacro ', urdf_path])}
@@ -93,6 +100,7 @@ def generate_launch_description():
                 '-z', str(-HILL_BURY_DEPTH),
             ],
             output='screen',
+            condition=IfCondition(LaunchConfiguration('spawn_terrain')),
         )
         for i in range(n_hills)
     ]
@@ -120,6 +128,7 @@ def generate_launch_description():
             '-z', '0',
         ],
         output='screen',
+        condition=IfCondition(LaunchConfiguration('spawn_terrain')),
     )
 
     clock_bridge = Node(
@@ -186,6 +195,7 @@ def generate_launch_description():
     return LaunchDescription([
         gz_extra_args_arg,
         world_file_arg,
+        spawn_terrain_arg,
         set_resource_path,
         gz_sim,
         robot_state_publisher,

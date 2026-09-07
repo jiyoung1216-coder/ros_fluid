@@ -741,6 +741,49 @@ def test_hw_style():
           core.state == ControlState.FAULT and not out.enable, core.diag.fault_reason)
 
 
+def test_tray_zero_offset_closed_loop():
+    print("\n[14] tray_zero_offset 폐루프 수렴 (2026-09-06 실측 버그)")
+    # 물리적으로 "조인트 명령 X"가 "실제 트레이 기울기 X+delta"를 만든다고
+    # 가정한다(delta = CAD/조립 오프셋). cfg.tray_zero_offset을 delta와
+    # 정확히 같게 설정했을 때, 트림 루프(적분 포함)가 물리적 기울기를
+    # 진짜 0으로 수렴시키는지 확인한다.
+    delta_roll = -0.025103
+    base = (0.0, 0.0)  # base는 완전 수평 -> 목표 tray도 수평(0)이어야 함
+
+    def closed_loop_physical_tilt(apply_offset_in_error, steps=4000, dt=0.01):
+        cfg = geometry_config(
+            enable_integral=True, ki_trim=0.01,
+            tray_zero_offset_roll_rad=delta_roll,
+            apply_tray_zero_offset_in_error=apply_offset_in_error,
+        )
+        core = ControlCore(cfg)
+        core.init_control()
+        core.request_activate()
+        out = ControlOutput()
+        t_us = 0
+        br, bp = base
+        for _ in range(steps):
+            t_us += int(dt * 1e6)
+            t_ms = t_us // 1000
+            joint_cmd = out.x_position_rad
+            physical_tilt = joint_cmd + delta_roll  # 물리 오프셋 실제 반영
+            imu = ImuPair(
+                base=make_sample(br, bp, t_us),
+                tray=make_sample(physical_tilt, 0.0, t_us),
+            )
+            out = core.step(imu, make_motor(t_ms), make_motor(t_ms), dt, t_us, t_ms)
+        return out.x_position_rad + delta_roll  # 최종 물리적 기울기
+
+    tilt_buggy = closed_loop_physical_tilt(apply_offset_in_error=True)
+    tilt_fixed = closed_loop_physical_tilt(apply_offset_in_error=False, steps=30000)
+
+    check("기존 동작(True): 폐루프가 물리적 기울기를 못 지움(델타 근처에 고착)",
+          close(tilt_buggy, delta_roll, 0.01), f"got {tilt_buggy:.5f}, delta={delta_roll}")
+    check("수정(False): 폐루프가 물리적 기울기를 훨씬 더 0에 가깝게 수렴 "
+          "(ki_trim=0.01이 작아 완전수렴엔 더 오래 걸림 — 방향/크기만 확인)",
+          abs(tilt_fixed) < abs(tilt_buggy) * 0.3, f"got {tilt_fixed:.5f} vs buggy {tilt_buggy:.5f}")
+
+
 def test_bench_drive_profile():
     print("\n[결정론 입력 생성기: bench_drive_profile]")
 
@@ -876,6 +919,7 @@ def main():
     test_deadband_in_loop()
     test_cnn_interface()
     test_hw_style()
+    test_tray_zero_offset_closed_loop()
     test_bench_drive_profile()
     test_bench_metrics()
     print("\n" + "=" * 70)

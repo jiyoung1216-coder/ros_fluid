@@ -192,30 +192,39 @@ def cleanup_all():
 # 한 회차: Gazebo + 컨트롤러 + dual-IMU 레코더 + 드라이브 프로파일
 # ---------------------------------------------------------------------------
 
-def run_dual_recording_trial(prefix, mode="drive", controller_on=True, extra_wait_s=15.0):
+def run_dual_recording_trial(prefix, mode="drive", controller_on=True, extra_wait_s=15.0,
+                              extra_controller_params=None, gui=False):
     """dual-IMU(base=off, tray=on) 단일 실행 기록 1회.
+
+    extra_controller_params: CONTROLLER_PARAMS_COMMON에 추가로 덧붙일
+    "-p key:=value" 문자열 리스트. 예: ["-p", "enable_trim:=false"]
+    (가설 E: 트레이 피드백 경로 격리 진단용, 기본 동작은 그대로 유지).
+    gui: True면 Gazebo를 헤드리스(-s) 없이 띄워 화면에 보이게 한다
+    (2026-09-06 사용자 요청 — 실행 과정을 직접 눈으로 보고 싶다고 함).
 
     반환: dict(off_csv, on_csv, cmdvel_csv, cmdvel_valid, cmdvel_reason)
     """
     cleanup_all()
     os.makedirs(os.path.dirname(os.path.abspath(prefix)) or ".", exist_ok=True)
 
-    log(f"[{prefix}] Gazebo 기동 (bench_fixed_step.sdf)")
+    log(f"[{prefix}] Gazebo 기동 (bench_fixed_step.sdf, {'GUI' if gui else 'headless'})")
     gz_log = open(f"{prefix}_gazebo.log", "w")
+    gz_extra = "-r" if gui else "-s -r"
     gz_proc = subprocess.Popen(
         ["ros2", "launch", "new_robot", "gazebo.launch.py",
-         f"world_file:={BENCH_WORLD} ", "gz_extra_args:=-s -r"],
+         f"world_file:={BENCH_WORLD} ", f"gz_extra_args:={gz_extra}", "spawn_terrain:=false"],
         cwd=REPO_ROOT, stdout=gz_log, stderr=subprocess.STDOUT, env=get_ros_env(),
     )
 
     controller_proc = None
     if controller_on:
         time.sleep(4.0)
-        log(f"[{prefix}] gimbal_leveling_controller 기동")
+        log(f"[{prefix}] gimbal_leveling_controller 기동"
+            + (f" (추가 파라미터: {extra_controller_params})" if extra_controller_params else ""))
         ctrl_log = open(f"{prefix}_controller.log", "w")
         controller_proc = subprocess.Popen(
             ["python3", os.path.join("sim_control", "gimbal_leveling_controller.py"),
-             "--ros-args"] + CONTROLLER_PARAMS_COMMON,
+             "--ros-args"] + CONTROLLER_PARAMS_COMMON + (extra_controller_params or []),
             cwd=REPO_ROOT, stdout=ctrl_log, stderr=subprocess.STDOUT, env=get_ros_env(),
         )
 
@@ -227,7 +236,14 @@ def run_dual_recording_trial(prefix, mode="drive", controller_on=True, extra_wai
     )
     time.sleep(WARMUP_S)
 
-    phases = bdp.CALIBRATION_PHASES if mode == "calibration" else bdp.PHASES
+    if mode == "calibration":
+        phases = bdp.CALIBRATION_PHASES
+    elif mode == "gentle":
+        phases = bdp.GENTLE_PHASES
+    elif mode == "short_gentle":
+        phases = bdp.SHORT_GENTLE_PHASES
+    else:
+        phases = bdp.PHASES
     excite_end = bdp.excitation_end_time(phases)
     total = bdp.total_duration(phases)
     log(f"[{prefix}] 드라이브 프로파일 시작 (mode={mode}, 총 {total:.1f}s, "
@@ -394,7 +410,7 @@ def run_base_only_trial(prefix, controller_on):
     gz_log = open(f"{prefix}_gazebo.log", "w")
     gz_proc = subprocess.Popen(
         ["ros2", "launch", "new_robot", "gazebo.launch.py",
-         f"world_file:={BENCH_WORLD} ", "gz_extra_args:=-s -r"],
+         f"world_file:={BENCH_WORLD} ", "gz_extra_args:=-s -r", "spawn_terrain:=false"],
         cwd=REPO_ROOT, stdout=gz_log, stderr=subprocess.STDOUT, env=get_ros_env(),
     )
 

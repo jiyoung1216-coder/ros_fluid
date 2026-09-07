@@ -35,6 +35,27 @@ PHASES = [
     (6.0, 0.0, 0.0),
 ]
 
+# 2026-09-06: 사용자 요청("잔잔하게, 가속도 문제 안 일어나게") — PHASES의
+# 절반 속도(0.4/0.4)로 같은 구조(직진가속 -> 완만한 회전 -> 정지)를 재사용.
+# 언덕 유무가 아니라 "주행 자체가 격렬한지"를 분리해서 보기 위한 대조군.
+GENTLE_PHASES = [
+    (2.0, 0.0, 0.0),
+    (3.0, 0.4, 0.0),
+    (3.0, 0.4, 0.4),
+    (0.5, 0.0, 0.0),
+    (6.0, 0.0, 0.0),
+]
+
+# 2026-09-06: 시간이 없다는 요청으로 GENTLE_PHASES를 그대로 축소(같은 순서,
+# 절반 길이)한 버전 — 평지 확인 후 빠른 1회성 확인용.
+SHORT_GENTLE_PHASES = [
+    (1.0, 0.0, 0.0),
+    (2.0, 0.4, 0.0),
+    (2.0, 0.4, 0.4),
+    (0.5, 0.0, 0.0),
+    (2.0, 0.0, 0.0),
+]
+
 # 정지 캘리브레이션 케이스 전용 — 자극 없이 대기만 한다(사용자 승인 답변
 # 추가사항 1). 길이 8초는 DualSPHysics accinput/extract_free_surface 파이프
 # 라인이 초기 과도응답을 지나 정상상태에 도달하기에 충분한 여유로 선택.
@@ -180,7 +201,14 @@ def main():
 
     mode = sys.argv[1] if len(sys.argv) > 1 else "drive"
     prefix = sys.argv[2] if len(sys.argv) > 2 else "bench"
-    phases = CALIBRATION_PHASES if mode == "calibration" else PHASES
+    if mode == "calibration":
+        phases = CALIBRATION_PHASES
+    elif mode == "gentle":
+        phases = GENTLE_PHASES
+    elif mode == "short_gentle":
+        phases = SHORT_GENTLE_PHASES
+    else:
+        phases = PHASES
 
     rclpy.init()
     # use_sim_time을 node 생성 이후 declare_parameter로 켜면 rclpy의
